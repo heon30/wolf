@@ -1,0 +1,3639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#090b18" />
+  <title>한밤의 늑대인간 온라인</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  color-scheme: dark;
+  --bg: #070914;
+  --panel: rgba(20, 24, 48, 0.92);
+  --panel-2: rgba(31, 37, 70, 0.86);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f7f7ff;
+  --muted: #afb5d4;
+  --accent: #9a8cff;
+  --accent-2: #66d9ff;
+  --danger: #ff6f82;
+  --success: #67e1a0;
+  --warning: #ffd36e;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(104, 89, 212, 0.34), transparent 42%),
+    radial-gradient(circle at 110% 30%, rgba(29, 131, 178, 0.20), transparent 34%),
+    linear-gradient(180deg, #090b19 0%, #05060e 100%);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.stars,
+.stars::before,
+.stars::after {
+  position: fixed;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.72) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(142,198,255,.55) 0 1px, transparent 1.5px);
+  background-size: 73px 73px, 121px 121px;
+  background-position: 7px 11px, 43px 29px;
+  opacity: .35;
+}
+.stars::before { transform: scale(1.35); opacity: .22; }
+.stars::after { transform: scale(.72); opacity: .30; }
+
+.app-shell {
+  width: min(760px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 16px calc(36px + env(safe-area-inset-bottom));
+  position: relative;
+  z-index: 1;
+}
+
+.card,
+.loading-card {
+  background: linear-gradient(145deg, rgba(28, 33, 65, .95), rgba(13, 16, 35, .96));
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+  backdrop-filter: blur(18px);
+}
+.loading-card { text-align: center; margin-top: 15vh; }
+.moon { font-size: 58px; filter: drop-shadow(0 0 22px rgba(255,228,138,.35)); }
+
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: clamp(30px, 7vw, 46px); margin-bottom: 8px; letter-spacing: -1.5px; }
+h2 { font-size: 25px; margin-bottom: 10px; }
+h3 { font-size: 18px; margin-bottom: 10px; }
+p { color: var(--muted); line-height: 1.65; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+.brand-mark { font-size: 28px; }
+.room-chip {
+  border: 1px solid rgba(154,140,255,.42);
+  background: rgba(154,140,255,.12);
+  border-radius: 999px;
+  padding: 8px 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.hero { text-align: center; padding: 26px 22px; }
+.hero .moon { margin-bottom: 8px; }
+.hero-sub { margin-bottom: 22px; }
+
+.form-grid { display: grid; gap: 12px; }
+.field { display: grid; gap: 7px; text-align: left; }
+.field label { color: #d9dcf0; font-weight: 700; font-size: 14px; }
+input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(5, 7, 17, .7);
+  color: var(--text);
+  border-radius: 15px;
+  padding: 14px 15px;
+  outline: none;
+}
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(154,140,255,.14); }
+input.room-input { text-transform: uppercase; letter-spacing: 5px; text-align: center; font-weight: 900; font-size: 22px; }
+
+.button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn {
+  border: 0;
+  border-radius: 15px;
+  min-height: 50px;
+  padding: 12px 16px;
+  font-weight: 900;
+  cursor: pointer;
+  color: #0c1022;
+  background: linear-gradient(135deg, var(--accent), #c2baff);
+  box-shadow: 0 10px 25px rgba(105, 89, 216, .28);
+  transition: transform .15s ease, opacity .15s ease, filter .15s ease;
+}
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: translateY(1px) scale(.99); }
+.btn:disabled { opacity: .38; cursor: not-allowed; filter: grayscale(.25); }
+.btn.secondary { color: var(--text); background: rgba(255,255,255,.08); border: 1px solid var(--line); box-shadow: none; }
+.btn.danger { color: white; background: linear-gradient(135deg, #d94761, var(--danger)); }
+.btn.success { color: #062316; background: linear-gradient(135deg, #4ecf8a, #8af0bb); }
+.btn.full { width: 100%; }
+.btn.small { min-height: 39px; padding: 8px 12px; border-radius: 12px; font-size: 13px; }
+
+.section { margin-top: 14px; }
+.status-banner {
+  border: 1px solid rgba(102,217,255,.25);
+  background: linear-gradient(135deg, rgba(102,217,255,.12), rgba(154,140,255,.12));
+  border-radius: 18px;
+  padding: 15px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.status-banner strong { display: block; font-size: 20px; margin-bottom: 4px; }
+
+.player-list { display: grid; gap: 9px; }
+.player-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 15px;
+  padding: 12px 14px;
+}
+.player-name { font-weight: 800; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 900;
+  background: rgba(255,255,255,.09);
+  color: #dce0f7;
+}
+.badge.host { background: rgba(255,211,110,.15); color: var(--warning); }
+.badge.done { background: rgba(103,225,160,.14); color: var(--success); }
+.badge.wait { background: rgba(255,111,130,.12); color: #ff9cab; }
+
+.role-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.13);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(154,140,255,.30), transparent 42%),
+    linear-gradient(145deg, rgba(39, 44, 84, .96), rgba(13, 16, 35, .98));
+  padding: 24px;
+  margin-bottom: 14px;
+}
+.role-icon { font-size: 60px; margin-bottom: 8px; }
+.role-name { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+.role-description { color: var(--muted); line-height: 1.6; max-width: 500px; }
+.role-hidden { cursor: pointer; }
+.role-hidden .role-icon { filter: grayscale(1); opacity: .85; }
+
+.option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.option-grid.three { grid-template-columns: repeat(3, 1fr); }
+.option {
+  min-height: 74px;
+  border-radius: 15px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.055);
+  color: var(--text);
+  padding: 12px 10px;
+  cursor: pointer;
+  font-weight: 800;
+}
+.option.selected { border-color: var(--accent); background: rgba(154,140,255,.20); box-shadow: inset 0 0 0 1px rgba(154,140,255,.35); }
+.option:disabled { opacity: .42; cursor: not-allowed; }
+
+.action-box {
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(5,7,17,.45);
+  border-radius: 20px;
+  padding: 18px;
+  margin-top: 14px;
+}
+.action-box h3 { margin-bottom: 7px; }
+.action-result {
+  border-left: 4px solid var(--accent-2);
+  background: rgba(102,217,255,.08);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+}
+.action-result p { margin: 0; color: #e8ebff; }
+
+.tab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.tab {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.05);
+  color: var(--muted);
+  border-radius: 12px;
+  padding: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.tab.active { color: var(--text); border-color: var(--accent); background: rgba(154,140,255,.16); }
+
+.host-panel {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255,211,110,.22);
+  background: rgba(255,211,110,.07);
+  border-radius: 18px;
+}
+.progress-line { height: 9px; background: rgba(255,255,255,.08); border-radius: 999px; overflow: hidden; margin: 10px 0 12px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: inherit; }
+
+.vote-table { display: grid; gap: 9px; }
+.vote-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,.055);
+  padding: 12px 14px;
+}
+.vote-count { font-size: 18px; font-weight: 900; }
+.eliminated { border-color: rgba(255,111,130,.48); background: rgba(255,111,130,.10); }
+
+.team-result {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+}
+.team-chip {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.055);
+  padding: 14px;
+  font-weight: 900;
+  text-align: center;
+}
+.team-chip.win { border-color: rgba(103,225,160,.38); background: rgba(103,225,160,.12); color: #a8f4ca; }
+.team-chip.lose { opacity: .55; }
+
+.reveal-grid { display: grid; gap: 10px; }
+.reveal-item {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.05);
+  padding: 14px;
+}
+.reveal-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 8px; }
+.role-change { color: var(--muted); }
+.role-change strong { color: var(--text); }
+.winner-mark { color: var(--success); font-weight: 900; }
+.reveal-card {
+  position: relative;
+  min-height: 108px;
+  border-radius: 18px;
+  perspective: 900px;
+}
+.reveal-card.reveal-clickable { cursor: pointer; }
+.reveal-card.reveal-clickable .reveal-back {
+  border-color: rgba(255,211,110,.42);
+  box-shadow: 0 0 0 1px rgba(255,211,110,.08), 0 18px 36px rgba(0,0,0,.18);
+}
+.reveal-card.reveal-clickable:hover .reveal-back { filter: brightness(1.12); }
+.reveal-card-inner {
+  position: relative;
+  width: 100%;
+  min-height: 108px;
+  transition: transform .62s cubic-bezier(.2,.78,.2,1);
+  transform-style: preserve-3d;
+}
+.reveal-card.is-revealed .reveal-card-inner { transform: rotateY(180deg); }
+.reveal-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  padding: 14px;
+  display: grid;
+  align-content: center;
+  background: linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
+}
+.reveal-back {
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(255,211,110,.20), transparent 30%),
+    linear-gradient(135deg, rgba(128,93,255,.22), rgba(255,255,255,.035));
+}
+.reveal-back .card-symbol { font-size: 34px; margin-bottom: 4px; }
+.reveal-front { transform: rotateY(180deg); }
+.reveal-front .big-role { font-size: 28px; font-weight: 1000; margin-top: 4px; }
+.reveal-lock-note { margin-top: 12px; color: var(--muted); font-size: 13px; text-align: center; }
+
+.center-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.center-card { text-align: center; padding: 12px 6px; border-radius: 14px; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+.center-card .mini-icon { font-size: 28px; }
+.center-card .mini-name { font-size: 12px; font-weight: 900; margin-top: 4px; }
+
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.spacer { height: 10px; }
+.divider { height: 1px; background: var(--line); margin: 16px 0; }
+.warning-text { color: var(--warning); }
+.error-text { color: #ff9cab; }
+.success-text { color: var(--success); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 20px);
+  z-index: 50;
+  background: rgba(10, 12, 25, .95);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: 13px;
+  padding: 11px 16px;
+  color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transition: .22s ease;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.chat-card { padding: 18px; }
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.chat-head h3 { margin: 0; }
+.chat-messages {
+  height: min(38vh, 340px);
+  min-height: 190px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 17px;
+  background: rgba(4, 6, 15, .48);
+  scrollbar-width: thin;
+}
+.chat-empty {
+  margin: auto;
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.chat-message {
+  align-self: flex-start;
+  width: min(88%, 520px);
+}
+.chat-message.mine { align-self: flex-end; }
+.chat-message-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 5px 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.chat-message.mine .chat-message-head { justify-content: flex-end; }
+.chat-bubble {
+  padding: 10px 12px;
+  border-radius: 15px 15px 15px 5px;
+  background: rgba(255,255,255,.085);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #f5f6ff;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.chat-message.mine .chat-bubble {
+  border-radius: 15px 15px 5px 15px;
+  background: linear-gradient(135deg, rgba(154,140,255,.30), rgba(102,217,255,.18));
+  border-color: rgba(154,140,255,.34);
+}
+.chat-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 10px;
+}
+.chat-form input { min-width: 0; }
+.chat-send { min-width: 74px; }
+.chat-notice {
+  margin: 8px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.chat-locked { color: var(--warning); }
+
+@media (max-width: 520px) {
+  .app-shell { padding: 14px 10px 30px; }
+  .card { padding: 18px; border-radius: 22px; }
+  .button-row { grid-template-columns: 1fr; }
+  .option-grid.three { grid-template-columns: 1fr; }
+  .center-cards { grid-template-columns: repeat(3, 1fr); }
+  h1 { font-size: 32px; }
+}
+
+
+/* 자동 밤 진행 */
+.night-status-simple {
+  justify-content: center;
+  text-align: center;
+}
+
+.handoff-box {
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.handoff-message {
+  margin: 8px 0 10px;
+  font-size: clamp(1.15rem, 4.8vw, 1.55rem);
+  font-weight: 900;
+  color: var(--warning);
+}
+
+.night-working {
+  position: relative;
+  overflow: hidden;
+}
+.night-working::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(126, 144, 255, 0.14), transparent 58%);
+  animation: nightPulse 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.working-moon {
+  position: relative;
+  z-index: 1;
+  font-size: 2.6rem;
+  animation: moonFloat 1.8s ease-in-out infinite;
+}
+.working-dots {
+  display: inline-block;
+  min-width: 1.6em;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: dotBlink 1.2s steps(4, end) infinite;
+}
+.auto-guide {
+  border-style: dashed;
+  opacity: 0.9;
+}
+.room-delete-panel {
+  border-color: rgba(255, 104, 124, 0.35);
+}
+@keyframes nightPulse {
+  0%, 100% { transform: scale(0.88); opacity: 0.45; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+@keyframes moonFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes dotBlink {
+  0% { width: 0; }
+  100% { width: 1.6em; }
+}
+
+/* 늑대 퇴치 버튼과 마을이장 */
+.wolf-hunt-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 220px);
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid rgba(255, 111, 130, .25);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 111, 130, .16), transparent 44%),
+    rgba(5, 7, 17, .48);
+}
+.wolf-hunt-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+.wolf-hunt-copy strong {
+  font-size: 17px;
+  color: #fff1f3;
+}
+.wolf-hunt-copy span {
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 13px;
+}
+.wolf-hunt-btn {
+  position: relative;
+  overflow: hidden;
+  min-height: 92px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 18px;
+  padding: 10px 12px;
+  color: white;
+  background: linear-gradient(145deg, #bf304d, #ff6f82);
+  box-shadow: 0 12px 28px rgba(217, 71, 97, .28);
+  cursor: pointer;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  user-select: none;
+  touch-action: manipulation;
+}
+.wolf-hunt-btn::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: radial-gradient(circle, rgba(255,255,255,.42), transparent 42%);
+  opacity: 0;
+  transform: scale(.2);
+}
+.wolf-hunt-btn:hover { filter: brightness(1.06); }
+.wolf-hunt-btn:active { transform: scale(.97); }
+.wolf-hunt-btn.hit { animation: wolfHit .18s ease-out; }
+.wolf-hunt-btn.hit::after { animation: wolfFlash .28s ease-out; }
+.wolf-hunt-icon { font-size: 24px; line-height: 1.1; }
+.wolf-hunt-btn small { font-size: 11px; opacity: .88; font-weight: 700; }
+.wolf-hunt-btn b { color: #fff7af; }
+
+.mayor-banner {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 211, 110, .36);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 211, 110, .16), rgba(154, 140, 255, .11));
+}
+.mayor-banner.pending { border-style: dashed; }
+.mayor-banner.empty { opacity: .78; }
+.mayor-crown {
+  flex: 0 0 auto;
+  font-size: 34px;
+  filter: drop-shadow(0 4px 10px rgba(255, 211, 110, .28));
+}
+.mayor-banner div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.mayor-banner strong {
+  color: #fff3bd;
+  font-size: 17px;
+}
+.mayor-banner span:not(.mayor-crown) {
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 12px;
+}
+
+@keyframes wolfHit {
+  0% { transform: scale(1); }
+  45% { transform: scale(.92) rotate(-1deg); }
+  100% { transform: scale(1); }
+}
+@keyframes wolfFlash {
+  0% { opacity: 0; transform: scale(.2); }
+  45% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@media (max-width: 520px) {
+  .wolf-hunt-panel { grid-template-columns: 1fr; }
+  .wolf-hunt-copy { text-align: center; }
+  .wolf-hunt-btn { min-height: 82px; }
+}
+
+  
+.role-config-panel {
+  border: 1px solid rgba(154,140,255,.24);
+  background: rgba(154,140,255,.07);
+  border-radius: 20px;
+  padding: 16px;
+}
+.role-config-panel.compact { background: rgba(255,255,255,.045); }
+.role-config-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.role-config-heading h3 { margin-bottom: 3px; }
+.role-config-heading p { margin: 0; font-size: 13px; }
+.deck-total {
+  flex: 0 0 auto;
+  border: 1px solid rgba(102,217,255,.28);
+  background: rgba(102,217,255,.10);
+  color: #bcecff;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.role-config-grid { display: grid; gap: 8px; }
+.role-config-row,
+.villager-auto-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(5,7,17,.34);
+  border-radius: 15px;
+  padding: 10px 12px;
+}
+.role-config-meta { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.role-config-meta > div { display: grid; gap: 2px; }
+.role-config-meta strong { font-size: 14px; }
+.role-config-meta span:not(.role-config-icon) { color: var(--muted); font-size: 11px; }
+.role-config-icon { font-size: 25px; }
+.role-counter { display: grid; grid-template-columns: 36px 36px 36px; align-items: center; text-align: center; gap: 4px; }
+.role-counter strong { font-size: 18px; }
+.counter-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  font-weight: 900;
+  font-size: 20px;
+  cursor: pointer;
+}
+.counter-btn:disabled { opacity: .3; cursor: not-allowed; }
+.villager-auto-row { margin-top: 10px; border-color: rgba(103,225,160,.20); background: rgba(103,225,160,.07); }
+.villager-auto-count { color: #a8f4ca; font-size: 19px; }
+.deck-warning,
+.deck-ok {
+  margin-top: 10px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.deck-warning { color: #ffd1d8; background: rgba(255,111,130,.10); border: 1px solid rgba(255,111,130,.20); }
+.deck-ok { color: #bdf4d4; background: rgba(103,225,160,.08); border: 1px solid rgba(103,225,160,.18); }
+.deck-formula { margin: 10px 0 0; text-align: center; font-size: 12px; }
+.deck-chip-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.deck-chip { border-radius: 999px; padding: 6px 9px; background: rgba(255,255,255,.07); border: 1px solid var(--line); font-size: 12px; font-weight: 800; }
+
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+  <main id="app" class="app-shell">
+    <section class="loading-card">
+      <div class="moon">🌕</div>
+      <h1>한밤의 늑대인간</h1>
+      <p>게임 서버에 연결하고 있습니다.</p>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInAnonymously,
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  increment,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  runTransaction,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  writeBatch,
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+window.__ONW_MODULE_LOADED__ = true;
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBEG9B48lFY7cy6dhi27GmQwE-RTBF6KrU",
+  authDomain: "pkdc-4b341.firebaseapp.com",
+  projectId: "pkdc-4b341",
+  storageBucket: "pkdc-4b341.firebasestorage.app",
+  messagingSenderId: "428720415775",
+  appId: "1:428720415775:web:7103b4c82e59947640212a",
+  measurementId: "G-1ZS1VY61RH",
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
+const appEl = document.querySelector("#app");
+const toastEl = document.querySelector("#toast");
+
+const ROLE_INFO = {
+  werewolf: {
+    name: "늑대인간",
+    icon: "🐺",
+    team: "wolf",
+    description: "다른 늑대인간을 확인합니다. 혼자라면 중앙 카드 한 장을 확인할 수 있습니다.",
+  },
+  seer: {
+    name: "예언자",
+    icon: "🔮",
+    team: "village",
+    description: "다른 사람의 카드 한 장 또는 중앙 카드 두 장을 확인합니다.",
+  },
+  robber: {
+    name: "강도",
+    icon: "🥷",
+    team: "village",
+    description: "다른 사람과 카드를 바꾼 뒤 새로 받은 카드를 확인합니다.",
+  },
+  troublemaker: {
+    name: "말썽쟁이",
+    icon: "🎭",
+    team: "village",
+    description: "다른 두 사람의 카드를 서로 바꾸지만 카드 내용은 보지 못합니다.",
+  },
+  witch: {
+    name: "마녀",
+    icon: "🧙",
+    team: "village",
+    description: "중앙 카드 한 장을 확인한 뒤 원하면 자신의 카드와 바꿀 수 있습니다.",
+  },
+  minion: {
+    name: "하수인",
+    icon: "🦹",
+    team: "wolf",
+    description: "늑대인간이 누구인지 확인합니다. 늑대인간은 하수인을 알 수 없습니다.",
+  },
+  drunk: {
+    name: "주정뱅이",
+    icon: "🍺",
+    team: "village",
+    description: "중앙 카드 한 장과 자신의 카드를 반드시 바꾸며, 새 카드는 확인하지 못합니다.",
+  },
+  insomniac: {
+    name: "불면증환자",
+    icon: "👁️",
+    team: "village",
+    description: "밤의 맨 마지막에 자신의 현재 카드를 다시 확인합니다.",
+  },
+  doppelganger: {
+    name: "도플갱어",
+    icon: "👥",
+    team: "copy",
+    description: "맨 처음 다른 사람의 역할을 보고 그 역할과 팀, 능력을 복제합니다.",
+  },
+  revealer: {
+    name: "계시자",
+    icon: "📣",
+    team: "village",
+    description: "다른 사람의 직업 하나를 확인합니다. 늑대인간이나 무두장이가 아니면 모두에게 공개됩니다.",
+  },
+  tanner: {
+    name: "무두장이",
+    icon: "🧵",
+    team: "tanner",
+    description: "투표로 자신이 죽으면 승리합니다.",
+  },
+  freemason: {
+    name: "프리메이슨",
+    icon: "🤝",
+    team: "village",
+    description: "다른 프리메이슨을 확인합니다.",
+  },
+  villager: {
+    name: "마을주민",
+    icon: "🏠",
+    team: "village",
+    description: "밤에는 특별한 행동을 하지 않습니다.",
+  },
+};
+
+const NIGHT_ORDER = ["doppelganger", "werewolf", "minion", "seer", "robber", "witch", "troublemaker", "drunk", "freemason", "revealer", "insomniac"];
+const ROOM_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const MIN_PLAYERS = 3;
+const MAX_PLAYERS = 16;
+const MAX_CARDS = MAX_PLAYERS + 3;
+const CONFIGURABLE_ROLES = ["doppelganger", "werewolf", "minion", "seer", "robber", "witch", "troublemaker", "drunk", "freemason", "revealer", "insomniac", "tanner"];
+const DEFAULT_ROLE_CONFIG = {
+  doppelganger: 0,
+  werewolf: 2,
+  minion: 0,
+  seer: 1,
+  robber: 1,
+  witch: 0,
+  troublemaker: 1,
+  drunk: 0,
+  freemason: 0,
+  revealer: 0,
+  insomniac: 0,
+  tanner: 1,
+};
+
+let currentUser = null;
+let roomCode = null;
+let roomData = null;
+let players = [];
+let myPrivate = null;
+let myVote = null;
+let hostPrivates = [];
+let hostVotes = [];
+let publicResult = null;
+let revealedResult = null;
+let chatMessages = [];
+let chatError = "";
+let chatSending = false;
+let lastChatSentAt = 0;
+let lastRenderedChatId = null;
+let myWolfHuntCount = 0;
+let localWolfHuntCount = 0;
+let pendingWolfHuntClicks = 0;
+let wolfHuntFlushTimer = null;
+let wolfHuntSending = false;
+let subscriptions = [];
+let hostSubscriptions = [];
+let membershipEstablished = false;
+let hostListenersActive = false;
+let processingActions = new Set();
+let nightAdvanceTimer = null;
+let nightAdvanceStageKey = "";
+let nightAdvanceInFlight = false;
+let roleVisible = false;
+let actionSubmitting = false;
+let uiState = {
+  seerMode: "player",
+  selectedPlayers: [],
+  selectedCenters: [],
+  voteTarget: null,
+  chatDraft: "",
+};
+
+function roleInfo(role) {
+  return ROLE_INFO[role] ?? { name: role ?? "알 수 없음", icon: "❓", team: "", description: "" };
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function showToast(message) {
+  toastEl.textContent = message;
+  toastEl.classList.add("show");
+  window.clearTimeout(showToast.timer);
+  showToast.timer = window.setTimeout(() => toastEl.classList.remove("show"), 2600);
+}
+
+function formatChatTime(timestamp) {
+  const date = timestamp?.toDate?.();
+  if (!date || Number.isNaN(date.getTime())) return "방금";
+  return new Intl.DateTimeFormat("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
+function isChatLocked() {
+  return roomData?.status === "night";
+}
+
+function isVotingPhase() {
+  return roomData?.status === "voting" || roomData?.status === "revote";
+}
+
+function formatError(error) {
+  console.error(error);
+  const code = error?.code ?? "";
+  if (code.includes("permission-denied")) return `Firebase 권한이 없습니다. pkdc-4b341 프로젝트의 Firestore 규칙 게시 상태를 확인해 주세요. (${code})`;
+  if (code.includes("unavailable")) return "네트워크 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.";
+  if (code.includes("auth/operation-not-allowed")) return "Firebase Authentication에서 익명 로그인을 활성화해 주세요.";
+  return error?.message || "처리 중 오류가 발생했습니다.";
+}
+
+function resetUiState() {
+  roleVisible = false;
+  actionSubmitting = false;
+  uiState = {
+    seerMode: "player",
+    selectedPlayers: [],
+    selectedCenters: [],
+    voteTarget: null,
+    chatDraft: "",
+  };
+}
+
+function cleanupSubscriptions() {
+  subscriptions.forEach((unsub) => unsub?.());
+  hostSubscriptions.forEach((unsub) => unsub?.());
+  subscriptions = [];
+  hostSubscriptions = [];
+  hostListenersActive = false;
+  window.clearTimeout(nightAdvanceTimer);
+  nightAdvanceTimer = null;
+  nightAdvanceStageKey = "";
+  nightAdvanceInFlight = false;
+  window.clearTimeout(wolfHuntFlushTimer);
+  wolfHuntFlushTimer = null;
+  pendingWolfHuntClicks = 0;
+  wolfHuntSending = false;
+}
+
+function isHost() {
+  return Boolean(currentUser && roomData?.hostUid === currentUser.uid);
+}
+
+function getPlayer(uid) {
+  return players.find((player) => player.uid === uid);
+}
+
+function playerName(uid) {
+  return getPlayer(uid)?.nickname ?? "알 수 없는 참가자";
+}
+
+function sortedPlayers(list = players) {
+  return [...list].sort((a, b) => {
+    const aTime = a.joinedAt?.seconds ?? Number.MAX_SAFE_INTEGER;
+    const bTime = b.joinedAt?.seconds ?? Number.MAX_SAFE_INTEGER;
+    if (aTime !== bTime) return aTime - bTime;
+    return a.nickname.localeCompare(b.nickname, "ko");
+  });
+}
+
+function createRoomCode() {
+  const bytes = new Uint32Array(4);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (value) => ROOM_CODE_CHARS[value % ROOM_CODE_CHARS.length]).join("");
+}
+
+function normalizeRoomCode(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .toUpperCase()
+    .replace(/[^A-Z2-9]/g, "")
+    .slice(-4);
+}
+
+function shuffle(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const random = new Uint32Array(1);
+    crypto.getRandomValues(random);
+    const j = random[0] % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function normalizeRoleConfig(value = roomData?.roleConfig) {
+  const source = value && typeof value === "object" ? value : DEFAULT_ROLE_CONFIG;
+  const result = {};
+  CONFIGURABLE_ROLES.forEach((role) => {
+    const raw = Number(source?.[role] ?? DEFAULT_ROLE_CONFIG[role] ?? 0);
+    result[role] = Math.max(0, Math.min(MAX_CARDS, Number.isFinite(raw) ? Math.floor(raw) : 0));
+  });
+  return result;
+}
+
+function getDeckPlan(count, roleConfig = normalizeRoleConfig()) {
+  const totalCards = Number(count) + 3;
+  const specialTotal = CONFIGURABLE_ROLES.reduce((sum, role) => sum + Number(roleConfig[role] ?? 0), 0);
+  const remaining = totalCards - specialTotal;
+  return {
+    totalCards,
+    specialTotal,
+    villagerCount: Math.max(0, remaining),
+    excess: Math.max(0, -remaining),
+    valid: count >= MIN_PLAYERS && count <= MAX_PLAYERS && remaining >= 0,
+  };
+}
+
+function buildDeckForRoom(count, roleConfig = normalizeRoleConfig()) {
+  const plan = getDeckPlan(count, roleConfig);
+  if (!plan.valid) return null;
+  const deck = [];
+  CONFIGURABLE_ROLES.forEach((role) => {
+    for (let i = 0; i < roleConfig[role]; i += 1) deck.push(role);
+  });
+  for (let i = 0; i < plan.villagerCount; i += 1) deck.push("villager");
+  return deck;
+}
+
+async function changeRoleCount(role, delta) {
+  if (!isHost()) throw new Error("방장만 역할 카드 수를 바꿀 수 있습니다.");
+  if (roomData?.status !== "lobby") throw new Error("대기실에서만 역할 구성을 바꿀 수 있습니다.");
+  if (!CONFIGURABLE_ROLES.includes(role)) throw new Error("알 수 없는 역할입니다.");
+
+  const current = normalizeRoleConfig(roomData?.roleConfig);
+  const nextValue = Math.max(0, Math.min(MAX_CARDS, current[role] + Number(delta || 0)));
+  if (nextValue === current[role]) return;
+
+  await updateDoc(roomRef(), {
+    roleConfig: { ...current, [role]: nextValue },
+    updatedAt: serverTimestamp(),
+  });
+}
+
+function roomRef(code = roomCode) {
+  return doc(db, "rooms", code);
+}
+
+function subRef(subcollection, id, code = roomCode) {
+  return doc(db, "rooms", code, subcollection, id);
+}
+
+function subCollection(subcollection, code = roomCode) {
+  return collection(db, "rooms", code, subcollection);
+}
+
+async function deleteSubcollection(name, code = roomCode) {
+  const snapshot = await getDocs(subCollection(name, code));
+  if (snapshot.empty) return;
+  const docs = [...snapshot.docs];
+  while (docs.length) {
+    const batch = writeBatch(db);
+    docs.splice(0, 15).forEach((snapshotDoc) => batch.delete(snapshotDoc.ref));
+    await batch.commit();
+  }
+}
+
+async function commitSetJobs(jobs, chunkSize = 5) {
+  const queue = [...jobs];
+  while (queue.length) {
+    const batch = writeBatch(db);
+    queue.splice(0, chunkSize).forEach(({ ref, data, options }) => {
+      if (options) batch.set(ref, data, options);
+      else batch.set(ref, data);
+    });
+    await batch.commit();
+  }
+}
+
+async function ensureSignedIn() {
+  if (auth.currentUser) return auth.currentUser;
+  const credential = await signInAnonymously(auth);
+  return credential.user;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    try {
+      await signInAnonymously(auth);
+    } catch (error) {
+      appEl.innerHTML = errorCard(formatError(error));
+    }
+    return;
+  }
+
+  currentUser = user;
+  const savedCode = localStorage.getItem("onw_room_code");
+  if (savedCode) {
+    try {
+      const savedRoom = await getDoc(roomRef(savedCode));
+      const ownPlayer = await getDoc(subRef("players", user.uid, savedCode));
+      const isSavedHost = savedRoom.exists() && savedRoom.data().hostUid === user.uid;
+      if (savedRoom.exists() && (isSavedHost || ownPlayer.exists())) {
+        roomCode = savedCode;
+        subscribeToRoom(savedCode);
+        return;
+      }
+    } catch (error) {
+      console.warn("기존 방 복구 실패", error);
+    }
+  }
+  render();
+});
+
+function errorCard(message) {
+  return `
+    <section class="card center" style="margin-top:15vh">
+      <div class="role-icon">⚠️</div>
+      <h2>연결할 수 없습니다</h2>
+      <p>${escapeHtml(message)}</p>
+      <button class="btn full" onclick="location.reload()">다시 시도</button>
+    </section>
+  `;
+}
+
+async function createRoom(nickname) {
+  currentUser = await ensureSignedIn();
+  const cleanNickname = nickname.trim().slice(0, 12);
+  if (cleanNickname.length < 1) throw new Error("닉네임을 입력해 주세요.");
+
+  let code = "";
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const candidate = createRoomCode();
+    const existing = await getDoc(roomRef(candidate));
+    if (!existing.exists()) {
+      code = candidate;
+      break;
+    }
+  }
+  if (!code) throw new Error("방 코드를 만들지 못했습니다. 다시 시도해 주세요.");
+
+  await setDoc(roomRef(code), {
+    hostUid: currentUser.uid,
+    hostNickname: cleanNickname,
+    status: "lobby",
+    nightIndex: null,
+    nightRole: null,
+    gameNumber: 0,
+    roleConfig: { ...DEFAULT_ROLE_CONFIG },
+    publicRevelations: [],
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  // 방장은 진행 전용이며 players 컬렉션에 참가자로 등록하지 않는다.
+  roomCode = code;
+  localStorage.setItem("onw_room_code", code);
+  localStorage.setItem("onw_nickname", cleanNickname);
+  subscribeToRoom(code);
+  showToast(`방 ${code}가 만들어졌습니다.`);
+}
+
+async function joinRoom(codeInput, nickname) {
+  currentUser = await ensureSignedIn();
+  const code = normalizeRoomCode(codeInput);
+  const cleanNickname = nickname.trim().slice(0, 12);
+  if (!/^[A-Z2-9]{4}$/.test(code)) throw new Error("4자리 방 코드를 정확히 입력해 주세요.");
+  if (!cleanNickname) throw new Error("닉네임을 입력해 주세요.");
+
+  const targetRoom = await getDoc(roomRef(code));
+  if (!targetRoom.exists()) throw new Error("존재하지 않는 방입니다.");
+
+  const ownPlayerRef = subRef("players", currentUser.uid, code);
+  const ownPlayer = await getDoc(ownPlayerRef);
+  const playerSnapshot = await getDocs(subCollection("players", code));
+  const joiningAsHost = targetRoom.data().hostUid === currentUser.uid;
+
+  if (joiningAsHost) {
+    // 구버전에서 방장이 player로 저장되어 있었다면 제거한다.
+    if (ownPlayer.exists()) await deleteDoc(ownPlayerRef);
+    await updateDoc(roomRef(code), {
+      hostNickname: cleanNickname,
+      updatedAt: serverTimestamp(),
+    });
+  } else {
+    if (!ownPlayer.exists()) {
+      if (targetRoom.data().status !== "lobby") throw new Error("이미 게임이 시작되어 새로 입장할 수 없습니다.");
+      if (playerSnapshot.size >= MAX_PLAYERS) throw new Error(`이 방은 이미 플레이어 ${MAX_PLAYERS}명으로 가득 찼습니다.`);
+      const duplicate = playerSnapshot.docs.some(
+        (item) => item.data().nickname?.trim().toLowerCase() === cleanNickname.toLowerCase(),
+      );
+      if (duplicate) throw new Error("같은 닉네임을 사용 중인 참가자가 있습니다.");
+    }
+
+    await setDoc(
+      ownPlayerRef,
+      {
+        uid: currentUser.uid,
+        nickname: cleanNickname,
+        isHost: false,
+        joinedAt: ownPlayer.exists() ? ownPlayer.data().joinedAt : serverTimestamp(),
+      },
+      { merge: true },
+    );
+  }
+
+  roomCode = code;
+  localStorage.setItem("onw_room_code", code);
+  localStorage.setItem("onw_nickname", cleanNickname);
+  subscribeToRoom(code);
+  showToast(`방 ${code}에 입장했습니다.`);
+}
+
+async function leaveRoom() {
+  if (!currentUser || !roomCode) return;
+  if (isHost()) {
+    throw new Error("방장은 플레이어가 아닙니다. 처음 화면으로 돌아가려면 '방 폭파' 버튼을 사용해 주세요.");
+  }
+
+  const code = roomCode;
+  await deleteDoc(subRef("players", currentUser.uid, code));
+  cleanupSubscriptions();
+  roomCode = null;
+  roomData = null;
+  players = [];
+  myPrivate = null;
+  myVote = null;
+  publicResult = null;
+  revealedResult = null;
+  chatMessages = [];
+  chatError = "";
+  myVote = null;
+  hostVotes = [];
+  publicResult = null;
+  revealedResult = null;
+  lastRenderedChatId = null;
+  myWolfHuntCount = 0;
+  localWolfHuntCount = 0;
+  pendingWolfHuntClicks = 0;
+  localStorage.removeItem("onw_room_code");
+  resetUiState();
+  render();
+}
+
+function exitRoomLocally(message = "처음 화면으로 이동했습니다.") {
+  cleanupSubscriptions();
+  roomCode = null;
+  roomData = null;
+  players = [];
+  myPrivate = null;
+  myVote = null;
+  hostPrivates = [];
+  hostVotes = [];
+  publicResult = null;
+  revealedResult = null;
+  chatMessages = [];
+  chatError = "";
+  myVote = null;
+  hostVotes = [];
+  publicResult = null;
+  revealedResult = null;
+  lastRenderedChatId = null;
+  myWolfHuntCount = 0;
+  localWolfHuntCount = 0;
+  pendingWolfHuntClicks = 0;
+  membershipEstablished = false;
+  localStorage.removeItem("onw_room_code");
+  resetUiState();
+  render();
+  if (message) showToast(message);
+}
+
+async function kickPlayer(uid) {
+  if (!isHost() || !roomCode) throw new Error("방장만 참가자를 강퇴할 수 있습니다.");
+  if (roomData?.status !== "lobby") throw new Error("참가자 강퇴는 대기실에서만 가능합니다.");
+  if (!uid || uid === currentUser.uid || uid === roomData.hostUid) throw new Error("방장은 강퇴할 수 없습니다.");
+
+  const target = getPlayer(uid);
+  if (!target) throw new Error("이미 방을 나간 참가자입니다.");
+  const confirmed = window.confirm(`${target.nickname}님을 방에서 강퇴할까요?`);
+  if (!confirmed) return;
+
+  for (const collectionName of ["private", "actions", "votes", "wolfClicks"]) {
+    try {
+      await deleteDoc(subRef(collectionName, uid, roomCode));
+    } catch (error) {
+      if (error?.code !== "not-found") throw error;
+    }
+  }
+  await deleteDoc(subRef("players", uid, roomCode));
+  showToast(`${target.nickname}님을 강퇴했습니다.`);
+}
+
+async function deleteRoomCompletely() {
+  if (!isHost() || !roomCode) throw new Error("방장만 방을 폭파할 수 있습니다.");
+  const confirmed = window.confirm("방을 폭파하면 모든 참가자가 즉시 처음 화면으로 이동하고 게임 기록과 채팅이 삭제됩니다. 정말 폭파할까요?");
+  if (!confirmed) return;
+
+  const code = roomCode;
+  await updateDoc(roomRef(code), {
+    status: "destroying",
+    destroyedBy: currentUser.uid,
+    updatedAt: serverTimestamp(),
+  });
+
+  const collections = ["messages", "private", "actions", "votes", "secrets", "results", "revealed", "wolfClicks", "players"];
+  for (const name of collections) {
+    await deleteSubcollection(name, code);
+  }
+  await deleteDoc(roomRef(code));
+}
+
+function subscribeToRoom(code) {
+  cleanupSubscriptions();
+  resetUiState();
+  chatMessages = [];
+  chatError = "";
+  myVote = null;
+  hostVotes = [];
+  publicResult = null;
+  revealedResult = null;
+  lastRenderedChatId = null;
+  myWolfHuntCount = 0;
+  localWolfHuntCount = 0;
+  pendingWolfHuntClicks = 0;
+  membershipEstablished = false;
+
+  subscriptions.push(
+    onSnapshot(roomRef(code), (snapshot) => {
+      if (!snapshot.exists()) {
+        showToast("방이 종료되었습니다.");
+        cleanupSubscriptions();
+        roomCode = null;
+        roomData = null;
+        localStorage.removeItem("onw_room_code");
+        render();
+        return;
+      }
+
+      const previousStep = `${roomData?.status ?? ""}:${roomData?.nightRole ?? ""}`;
+      const previousGameNumber = roomData?.gameNumber;
+      roomData = { id: snapshot.id, ...snapshot.data() };
+      // 구버전 방에 방장 player 문서가 남아 있어도 게임 인원에서는 제외한다.
+      players = players.filter((player) => player.uid !== roomData.hostUid);
+      if (roomData.status === "destroying") {
+        exitRoomLocally("💥 방장이 방을 폭파해 처음 화면으로 이동했습니다.");
+        return;
+      }
+      const currentStep = `${roomData.status}:${roomData.nightRole ?? ""}`;
+      if (previousStep && previousStep !== currentStep) resetUiState();
+      if (previousGameNumber !== undefined && previousGameNumber !== roomData.gameNumber) {
+        myWolfHuntCount = 0;
+        localWolfHuntCount = 0;
+        pendingWolfHuntClicks = 0;
+      }
+      ensureHostListeners();
+      if (isHost()) maybeAutoAdvanceNight();
+      render();
+    }, (error) => showToast(formatError(error))),
+  );
+
+  subscriptions.push(
+    onSnapshot(query(subCollection("players", code), orderBy("joinedAt", "asc")), (snapshot) => {
+      const rawPlayers = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+      const currentIsHost = Boolean(currentUser && roomData?.hostUid === currentUser.uid);
+      players = rawPlayers.filter((player) => player.uid !== roomData?.hostUid);
+      const stillMember = rawPlayers.some((player) => player.uid === currentUser?.uid);
+      if (currentIsHost || stillMember) membershipEstablished = true;
+      if (!currentIsHost && membershipEstablished && !stillMember && roomCode === code && roomData?.status !== "destroying") {
+        exitRoomLocally("🚪 방장에 의해 강퇴되어 처음 화면으로 이동했습니다.");
+        return;
+      }
+      render();
+    }, (error) => showToast(formatError(error))),
+  );
+
+  subscriptions.push(
+    onSnapshot(
+      query(subCollection("messages", code), orderBy("createdAt", "desc"), limit(100)),
+      (snapshot) => {
+        chatError = "";
+        chatMessages = snapshot.docs
+          .map((item) => ({ id: item.id, ...item.data() }))
+          .reverse();
+        render();
+      },
+      (error) => {
+        chatError = formatError(error);
+        console.warn("채팅 구독 오류", error);
+        render();
+      },
+    ),
+  );
+
+  subscriptions.push(
+    onSnapshot(subRef("private", currentUser.uid, code), (snapshot) => {
+      const previousCopiedPending = Boolean(myPrivate?.copiedAbilityPending);
+      myPrivate = snapshot.exists() ? snapshot.data() : null;
+      if (myPrivate?.actionResolved || myPrivate?.actionDone || myPrivate?.copiedAbilityPending) actionSubmitting = false;
+      if (!previousCopiedPending && myPrivate?.copiedAbilityPending) {
+        uiState.selectedPlayers = [];
+        uiState.selectedCenters = [];
+        uiState.seerMode = "player";
+      }
+      render();
+    }, (error) => console.warn("개인 역할 구독 오류", error)),
+  );
+
+  subscriptions.push(
+    onSnapshot(subRef("wolfClicks", currentUser.uid, code), (snapshot) => {
+      const data = snapshot.exists() ? snapshot.data() : null;
+      myWolfHuntCount = data?.gameNumber === roomData?.gameNumber ? Number(data.count ?? 0) : 0;
+      if (localWolfHuntCount < myWolfHuntCount) localWolfHuntCount = myWolfHuntCount;
+      const countEl = document.querySelector("#wolf-hunt-count");
+      if (countEl) countEl.textContent = `${localWolfHuntCount}회`;
+    }, (error) => console.warn("늑대 퇴치 집계 구독 오류", error)),
+  );
+
+  subscriptions.push(
+    onSnapshot(subRef("votes", currentUser.uid, code), (snapshot) => {
+      myVote = snapshot.exists() ? snapshot.data() : null;
+      render();
+    }, (error) => console.warn("내 투표 구독 오류", error)),
+  );
+
+  subscriptions.push(
+    onSnapshot(subCollection("votes", code), (snapshot) => {
+      hostVotes = snapshot.docs.map((item) => ({ uid: item.id, ...item.data() }));
+      render();
+    }, (error) => console.warn("투표 현황 구독 오류", error)),
+  );
+
+  subscriptions.push(
+    onSnapshot(subRef("results", "main", code), (snapshot) => {
+      publicResult = snapshot.exists() ? snapshot.data() : null;
+      render();
+    }, (error) => console.warn("결과 구독 오류", error)),
+  );
+
+  subscriptions.push(
+    onSnapshot(subRef("revealed", "main", code), (snapshot) => {
+      revealedResult = snapshot.exists() ? snapshot.data() : null;
+      render();
+    }, (error) => console.warn("직업 공개 구독 오류", error)),
+  );
+}
+
+function ensureHostListeners() {
+  if (!isHost() || hostListenersActive || !roomCode) return;
+  hostListenersActive = true;
+
+  hostSubscriptions.push(
+    onSnapshot(subCollection("private"), (snapshot) => {
+      hostPrivates = snapshot.docs.map((item) => ({ uid: item.id, ...item.data() }));
+      maybeAutoAdvanceNight();
+      render();
+    }, (error) => console.warn("방장 역할 문서 구독 오류", error)),
+  );
+
+  hostSubscriptions.push(
+    onSnapshot(subCollection("votes"), (snapshot) => {
+      hostVotes = snapshot.docs.map((item) => ({ uid: item.id, ...item.data() }));
+      render();
+    }, (error) => console.warn("방장 투표 구독 오류", error)),
+  );
+
+  hostSubscriptions.push(
+    onSnapshot(subCollection("actions"), (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const data = change.doc.data();
+        if (!data.processed && !processingActions.has(change.doc.id)) {
+          processingActions.add(change.doc.id);
+          processAction(change.doc.id)
+            .catch((error) => console.error("행동 처리 실패", error))
+            .finally(() => processingActions.delete(change.doc.id));
+        }
+      });
+    }, (error) => console.warn("행동 구독 오류", error)),
+  );
+}
+
+async function sendChatMessage(rawText) {
+  const chatIdentity = isHost()
+    ? { uid: currentUser?.uid, nickname: roomData?.hostNickname || "방장" }
+    : getPlayer(currentUser?.uid);
+  if (!currentUser || !roomCode || !chatIdentity) {
+    throw new Error("방에 입장한 뒤 채팅할 수 있습니다.");
+  }
+  if (isChatLocked()) {
+    throw new Error("밤 행동 중에는 채팅을 보낼 수 없습니다.");
+  }
+
+  const cleanText = String(rawText ?? "").trim().slice(0, 120);
+  if (!cleanText) throw new Error("메시지를 입력해 주세요.");
+  if (Date.now() - lastChatSentAt < 700) {
+    throw new Error("메시지는 잠시 간격을 두고 보내 주세요.");
+  }
+
+  const sender = chatIdentity;
+  const previousDraft = cleanText;
+  chatSending = true;
+  uiState.chatDraft = "";
+  render();
+
+  try {
+    await setDoc(doc(subCollection("messages")), {
+      senderUid: currentUser.uid,
+      senderName: sender.nickname,
+      text: cleanText,
+      createdAt: serverTimestamp(),
+    });
+    lastChatSentAt = Date.now();
+  } catch (error) {
+    uiState.chatDraft = previousDraft;
+    throw error;
+  } finally {
+    chatSending = false;
+    render();
+  }
+}
+
+function updateWolfHuntButtonFeedback() {
+  const countEl = document.querySelector("#wolf-hunt-count");
+  if (countEl) countEl.textContent = `${localWolfHuntCount}회`;
+  const button = document.querySelector('[data-action="wolf-hunt"]');
+  if (button) {
+    button.classList.remove("hit");
+    void button.offsetWidth;
+    button.classList.add("hit");
+  }
+}
+
+function queueWolfHuntClick() {
+  if (!currentUser || isHost() || roomData?.status !== "night") return;
+  localWolfHuntCount += 1;
+  pendingWolfHuntClicks += 1;
+  updateWolfHuntButtonFeedback();
+  window.clearTimeout(wolfHuntFlushTimer);
+  wolfHuntFlushTimer = window.setTimeout(() => {
+    flushWolfHuntClicks().catch((error) => showToast(formatError(error)));
+  }, 180);
+}
+
+async function flushWolfHuntClicks() {
+  if (wolfHuntSending || pendingWolfHuntClicks <= 0 || !currentUser || !roomCode) return;
+  const delta = Math.min(pendingWolfHuntClicks, 100);
+  pendingWolfHuntClicks -= delta;
+  wolfHuntSending = true;
+  try {
+    await setDoc(subRef("wolfClicks", currentUser.uid), {
+      uid: currentUser.uid,
+      count: increment(delta),
+      gameNumber: roomData?.gameNumber ?? 0,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } catch (error) {
+    pendingWolfHuntClicks += delta;
+    throw error;
+  } finally {
+    wolfHuntSending = false;
+    if (pendingWolfHuntClicks > 0 && roomData?.status === "night") {
+      window.clearTimeout(wolfHuntFlushTimer);
+      wolfHuntFlushTimer = window.setTimeout(() => {
+        flushWolfHuntClicks().catch((error) => showToast(formatError(error)));
+      }, 180);
+    }
+  }
+}
+
+async function finalizeVillageMayor(gameNumber) {
+  if (!isHost()) return;
+  const snapshot = await getDocs(subCollection("wolfClicks"));
+  const activeUids = new Set(players.map((player) => player.uid));
+  const scores = snapshot.docs
+    .map((item) => item.data())
+    .filter((item) => activeUids.has(item.uid) && item.gameNumber === gameNumber)
+    .map((item) => ({ uid: item.uid, count: Number(item.count ?? 0) }))
+    .filter((item) => item.count > 0);
+
+  if (!scores.length) {
+    await updateDoc(roomRef(), {
+      mayorResolved: true,
+      mayorUid: null,
+      mayorCount: 0,
+      mayorTieCount: 0,
+      updatedAt: serverTimestamp(),
+    });
+    return;
+  }
+
+  const maxCount = Math.max(...scores.map((item) => item.count));
+  const leaders = scores.filter((item) => item.count === maxCount);
+  const winner = leaders[Math.floor(Math.random() * leaders.length)];
+  await updateDoc(roomRef(), {
+    mayorResolved: true,
+    mayorUid: winner.uid,
+    mayorCount: maxCount,
+    mayorTieCount: leaders.length,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+async function startGame() {
+  if (!isHost()) throw new Error("방장만 게임을 시작할 수 있습니다.");
+  const orderedPlayers = sortedPlayers();
+  const count = orderedPlayers.length;
+  if (count < MIN_PLAYERS || count > MAX_PLAYERS) {
+    throw new Error(`게임은 ${MIN_PLAYERS}명부터 ${MAX_PLAYERS}명까지 참여할 수 있습니다.`);
+  }
+
+  const roleConfig = normalizeRoleConfig(roomData?.roleConfig);
+  const plan = getDeckPlan(count, roleConfig);
+  const deck = buildDeckForRoom(count, roleConfig);
+  if (!deck) {
+    throw new Error(`특수 역할 카드가 ${plan.excess}장 너무 많습니다. 역할 수를 줄여 주세요.`);
+  }
+
+  let stage = "이전 게임 기록 정리";
+  try {
+    for (const name of ["private", "actions", "votes", "secrets", "results", "revealed", "wolfClicks"]) {
+      await deleteSubcollection(name);
+    }
+
+    myWolfHuntCount = 0;
+    localWolfHuntCount = 0;
+    pendingWolfHuntClicks = 0;
+
+    const shuffledDeck = shuffle(deck);
+    const initialRoles = {};
+    const currentRoles = {};
+    orderedPlayers.forEach((player, index) => {
+      initialRoles[player.uid] = shuffledDeck[index];
+      currentRoles[player.uid] = shuffledDeck[index];
+    });
+    const centerRoles = shuffledDeck.slice(count);
+
+    stage = "전체 역할 저장";
+    await setDoc(subRef("secrets", "main"), {
+      initialRoles,
+      currentRoles,
+      centerRoles,
+      publicRevelations: [],
+      doppelCopies: {},
+      roleConfig,
+      createdAt: serverTimestamp(),
+    });
+
+    stage = "개인 역할 배정";
+    await commitSetJobs(orderedPlayers.map((player) => ({
+      ref: subRef("private", player.uid),
+      data: {
+        initialRole: initialRoles[player.uid],
+        currentRole: currentRoles[player.uid],
+        actionResolved: false,
+        actionDone: false,
+        viewInfo: null,
+        copiedRole: null,
+        copiedAbilityPending: false,
+        lastStep: "doppelganger",
+      },
+    })), 5);
+
+    stage = "방 상태 변경";
+    await updateDoc(roomRef(), {
+      status: "night",
+      nightIndex: 0,
+      nightRole: "doppelganger",
+      gameNumber: (roomData.gameNumber ?? 0) + 1,
+      mayorResolved: false,
+      mayorUid: null,
+      mayorCount: 0,
+      mayorTieCount: 0,
+      publicRevelations: [],
+      updatedAt: serverTimestamp(),
+    });
+
+    stage = "첫 번째 밤 역할 준비";
+    await prepareNightStage("doppelganger");
+  } catch (error) {
+    console.error(`게임 시작 실패 - ${stage}`, error);
+    const code = error?.code ? ` (${error.code})` : "";
+    throw new Error(`게임 시작 중 '${stage}' 단계에서 실패했습니다${code}. Firestore 규칙과 익명 로그인을 확인해 주세요.`);
+  }
+}
+
+async function prepareNightStage(role) {
+  if (!isHost()) return;
+  const secretSnapshot = await getDoc(subRef("secrets", "main"));
+  if (!secretSnapshot.exists()) throw new Error("게임 역할 정보가 없습니다.");
+  const secrets = secretSnapshot.data();
+  const allUids = Object.keys(secrets.initialRoles);
+  const copiedRoleFor = (uid) => secrets.doppelCopies?.[uid] ?? null;
+  const actors = allUids.filter((uid) =>
+    secrets.initialRoles[uid] === role
+    || ((role === "werewolf" || role === "freemason" || role === "insomniac") && copiedRoleFor(uid) === role)
+  );
+
+  const stageData = new Map(allUids.map((uid) => [uid, {
+    actionResolved: false,
+    actionDone: false,
+    viewInfo: null,
+    copiedAbilityPending: false,
+    lastStep: role,
+  }]));
+
+  if (role === "werewolf") {
+    if (actors.length > 1) {
+      actors.forEach((uid) => {
+        stageData.set(uid, {
+          ...stageData.get(uid),
+          actionResolved: true,
+          viewInfo: {
+            kind: "players",
+            title: "함께하는 늑대인간",
+            playerUids: actors.filter((otherUid) => otherUid !== uid),
+          },
+        });
+      });
+    } else if (actors.length === 1) {
+      stageData.set(actors[0], {
+        ...stageData.get(actors[0]),
+        viewInfo: {
+          kind: "message",
+          title: "혼자 남은 늑대인간",
+          text: "다른 늑대인간이 없습니다. 중앙 카드 한 장을 선택해 확인하세요.",
+        },
+      });
+    }
+  }
+
+  if (role === "freemason") {
+    actors.forEach((uid) => {
+      const others = actors.filter((otherUid) => otherUid !== uid);
+      stageData.set(uid, {
+        ...stageData.get(uid),
+        actionResolved: true,
+        viewInfo: others.length
+          ? { kind: "players", title: "다른 프리메이슨", playerUids: others }
+          : { kind: "message", title: "혼자인 프리메이슨", text: "다른 프리메이슨은 중앙 카드에 있습니다." },
+      });
+    });
+  }
+
+  if (role === "minion") {
+    const wolfUids = allUids.filter((uid) => secrets.initialRoles[uid] === "werewolf" || copiedRoleFor(uid) === "werewolf");
+    actors.forEach((uid) => {
+      stageData.set(uid, {
+        ...stageData.get(uid),
+        actionResolved: true,
+        viewInfo: wolfUids.length
+          ? { kind: "players", title: "확인한 늑대인간", playerUids: wolfUids }
+          : { kind: "message", title: "늑대인간 없음", text: "플레이어 중 늑대인간이 없습니다." },
+      });
+    });
+  }
+
+  if (role === "insomniac") {
+    actors.forEach((uid) => {
+      stageData.set(uid, {
+        ...stageData.get(uid),
+        actionResolved: true,
+        viewInfo: {
+          kind: "roles",
+          title: "불면증환자가 확인한 현재 카드",
+          cards: [{ label: "현재 내 역할", role: secrets.currentRoles[uid] }],
+        },
+      });
+    });
+  }
+
+  await commitSetJobs(allUids.map((uid) => ({
+    ref: subRef("private", uid),
+    data: stageData.get(uid),
+    options: { merge: true },
+  })), 5);
+}
+
+function validateTargetUid(uid, currentRoles, actorUid) {
+  return Boolean(uid && uid !== actorUid && Object.hasOwn(currentRoles, uid));
+}
+
+async function processAction(actorUid) {
+  if (!isHost()) return;
+  const actionRef = subRef("actions", actorUid);
+  const gameSecretRef = subRef("secrets", "main");
+  const actorPrivateRef = subRef("private", actorUid);
+
+  await runTransaction(db, async (transaction) => {
+    const [actionSnapshot, roomSnapshot, secretSnapshot, actorPrivateSnapshot] = await Promise.all([
+      transaction.get(actionRef),
+      transaction.get(roomRef()),
+      transaction.get(gameSecretRef),
+      transaction.get(actorPrivateRef),
+    ]);
+
+    if (!actionSnapshot.exists() || actionSnapshot.data().processed) return;
+    if (!roomSnapshot.exists() || roomSnapshot.data().status !== "night") return;
+    if (!secretSnapshot.exists() || !actorPrivateSnapshot.exists()) return;
+
+    const action = actionSnapshot.data();
+    const activeRole = roomSnapshot.data().nightRole;
+    const secrets = secretSnapshot.data();
+    const initialRole = secrets.initialRoles?.[actorUid];
+    const currentRoles = { ...secrets.currentRoles };
+    const privateData = actorPrivateSnapshot.data();
+    const copiedRole = secrets.doppelCopies?.[actorUid] ?? privateData.copiedRole ?? null;
+    const canActThisStep = initialRole === activeRole
+      || ((activeRole === "werewolf" || activeRole === "freemason" || activeRole === "insomniac") && copiedRole === activeRole);
+
+    if (action.step !== activeRole || !canActThisStep) {
+      transaction.update(actionRef, {
+        processed: true,
+        error: "현재 행동 순서와 맞지 않습니다.",
+        processedAt: serverTimestamp(),
+      });
+      return;
+    }
+
+    if (action.type === "finish-role") {
+      if (!privateData.actionResolved) {
+        transaction.update(actionRef, {
+          processed: true,
+          error: "역할 행동을 먼저 완료해야 합니다.",
+          processedAt: serverTimestamp(),
+        });
+        return;
+      }
+      transaction.update(actorPrivateRef, { actionDone: true });
+      transaction.update(actionRef, {
+        processed: true,
+        processedAt: serverTimestamp(),
+      });
+      return;
+    }
+
+    if (privateData.actionResolved) {
+      transaction.update(actionRef, {
+        processed: true,
+        error: "이미 역할 행동을 수행했습니다.",
+        processedAt: serverTimestamp(),
+      });
+      return;
+    }
+
+    let viewInfo = null;
+
+    if (activeRole === "werewolf") {
+      const wolfUids = Object.keys(secrets.initialRoles)
+        .filter((uid) => secrets.initialRoles[uid] === "werewolf" || secrets.doppelCopies?.[uid] === "werewolf");
+      const centerIndex = Number(action.payload?.centerIndex);
+      if (wolfUids.length !== 1 || ![0, 1, 2].includes(centerIndex)) {
+        transaction.update(actionRef, { processed: true, error: "유효하지 않은 선택입니다." });
+        return;
+      }
+      viewInfo = {
+        kind: "roles",
+        title: "확인한 중앙 카드",
+        cards: [{ label: `중앙 카드 ${centerIndex + 1}`, role: secrets.centerRoles[centerIndex] }],
+      };
+    }
+
+    if (activeRole === "seer") {
+      const mode = action.payload?.mode;
+      if (mode === "center") {
+        const indices = [...new Set(action.payload?.centerIndices ?? [])].map(Number);
+        if (indices.length !== 2 || indices.some((index) => ![0, 1, 2].includes(index))) {
+          transaction.update(actionRef, { processed: true, error: "중앙 카드 두 장을 선택해야 합니다." });
+          return;
+        }
+        viewInfo = {
+          kind: "roles",
+          title: "예언자가 확인한 중앙 카드",
+          cards: indices.map((index) => ({ label: `중앙 카드 ${index + 1}`, role: secrets.centerRoles[index] })),
+        };
+      } else {
+        const targetUid = action.payload?.targetUid;
+        if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+          transaction.update(actionRef, { processed: true, error: "다른 참가자 한 명을 선택해야 합니다." });
+          return;
+        }
+        viewInfo = {
+          kind: "roles",
+          title: "예언자가 확인한 카드",
+          cards: [{ labelUid: targetUid, role: currentRoles[targetUid] }],
+        };
+      }
+    }
+
+    if (activeRole === "robber") {
+      const targetUid = action.payload?.targetUid;
+      if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+        transaction.update(actionRef, { processed: true, error: "교환할 참가자를 선택해야 합니다." });
+        return;
+      }
+      const actorRole = currentRoles[actorUid];
+      const targetRole = currentRoles[targetUid];
+      currentRoles[actorUid] = targetRole;
+      currentRoles[targetUid] = actorRole;
+
+      transaction.update(gameSecretRef, { currentRoles });
+      transaction.update(actorPrivateRef, { currentRole: targetRole });
+      transaction.update(subRef("private", targetUid), { currentRole: actorRole });
+      viewInfo = {
+        kind: "roles",
+        title: "강도가 새로 받은 카드",
+        cards: [{ label: "현재 내 역할", role: targetRole }],
+      };
+    }
+
+  if (activeRole === "troublemaker") {
+      const targets = [...new Set(action.payload?.targetUids ?? [])];
+      if (targets.length !== 2 || targets.some((uid) => !validateTargetUid(uid, currentRoles, actorUid))) {
+        transaction.update(actionRef, { processed: true, error: "서로 다른 참가자 두 명을 선택해야 합니다." });
+        return;
+      }
+      const [firstUid, secondUid] = targets;
+      const firstRole = currentRoles[firstUid];
+      const secondRole = currentRoles[secondUid];
+      currentRoles[firstUid] = secondRole;
+      currentRoles[secondUid] = firstRole;
+
+      transaction.update(gameSecretRef, { currentRoles });
+      transaction.update(subRef("private", firstUid), { currentRole: secondRole });
+      transaction.update(subRef("private", secondUid), { currentRole: firstRole });
+      viewInfo = {
+        kind: "players",
+        title: "서로 바꾼 참가자",
+        playerUids: targets,
+        text: "카드 내용은 확인할 수 없습니다.",
+      };
+    }
+
+    if (activeRole === "witch") {
+      const centerIndex = Number(action.payload?.centerIndex);
+      const swap = Boolean(action.payload?.swap);
+      if (![0, 1, 2].includes(centerIndex)) {
+        transaction.update(actionRef, { processed: true, error: "중앙 카드 한 장을 선택해야 합니다." });
+        return;
+      }
+      const centerRole = secrets.centerRoles[centerIndex];
+      if (action.type === "witch-view") {
+        viewInfo = {
+          kind: "roles",
+          title: "마녀가 확인한 중앙 카드",
+          cards: [{ label: `중앙 카드 ${centerIndex + 1}`, role: centerRole }],
+          witchCenterIndex: centerIndex,
+        };
+        transaction.update(actorPrivateRef, { actionResolved: false, actionDone: false, viewInfo, witchCenterIndex: centerIndex, copiedAbilityPending: true });
+        transaction.update(actionRef, { processed: true, processedAt: serverTimestamp() });
+        return;
+      }
+      if (action.type === "witch-decide") {
+        const savedIndex = Number(privateData.witchCenterIndex);
+        if (![0,1,2].includes(savedIndex)) {
+          transaction.update(actionRef, { processed: true, error: "먼저 중앙 카드를 확인해야 합니다." });
+          return;
+        }
+        if (swap) {
+          const actorRole = currentRoles[actorUid];
+          const newCenterRoles = [...secrets.centerRoles];
+          const targetRole = newCenterRoles[savedIndex];
+          currentRoles[actorUid] = targetRole;
+          newCenterRoles[savedIndex] = actorRole;
+          transaction.update(gameSecretRef, { currentRoles, centerRoles: newCenterRoles });
+          transaction.update(actorPrivateRef, { currentRole: targetRole });
+          viewInfo = { kind: "message", title: "마녀의 선택", text: "확인한 중앙 카드와 자신의 카드를 바꿨습니다." };
+        } else {
+          viewInfo = { kind: "message", title: "마녀의 선택", text: "카드를 바꾸지 않았습니다." };
+        }
+      }
+    }
+
+    if (activeRole === "drunk") {
+      const centerIndex = Number(action.payload?.centerIndex);
+      if (![0, 1, 2].includes(centerIndex)) {
+        transaction.update(actionRef, { processed: true, error: "중앙 카드 한 장을 선택해야 합니다." });
+        return;
+      }
+      const actorRole = currentRoles[actorUid];
+      const newCenterRoles = [...secrets.centerRoles];
+      const targetRole = newCenterRoles[centerIndex];
+      currentRoles[actorUid] = targetRole;
+      newCenterRoles[centerIndex] = actorRole;
+      transaction.update(gameSecretRef, { currentRoles, centerRoles: newCenterRoles });
+      transaction.update(actorPrivateRef, { currentRole: targetRole });
+      viewInfo = { kind: "message", title: "주정뱅이의 교환", text: "중앙 카드와 바꿨습니다. 새로 받은 카드는 확인할 수 없습니다." };
+    }
+
+    if (activeRole === "doppelganger") {
+      if (action.type === "doppel-copy") {
+        const targetUid = action.payload?.targetUid;
+        if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+          transaction.update(actionRef, { processed: true, error: "복제할 참가자 한 명을 선택해야 합니다." });
+          return;
+        }
+        const targetRole = currentRoles[targetUid];
+        const doppelCopies = { ...(secrets.doppelCopies ?? {}), [actorUid]: targetRole };
+        currentRoles[actorUid] = targetRole;
+        transaction.update(gameSecretRef, { currentRoles, doppelCopies });
+        transaction.update(actorPrivateRef, {
+          copiedRole: targetRole,
+          currentRole: targetRole,
+          copiedAbilityPending: ["seer", "robber", "witch", "troublemaker", "drunk", "minion", "revealer"].includes(targetRole),
+          actionResolved: !["seer", "robber", "witch", "troublemaker", "drunk", "minion", "revealer"].includes(targetRole),
+          actionDone: false,
+          viewInfo: {
+            kind: "roles",
+            title: "도플갱어가 복제한 역할",
+            cards: [{ labelUid: targetUid, role: targetRole }],
+            text: targetRole === "werewolf" || targetRole === "freemason" || targetRole === "insomniac"
+              ? `${roleInfo(targetRole).name} 차례에 함께 행동합니다.`
+              : ["seer", "robber", "witch", "troublemaker", "drunk", "minion", "revealer"].includes(targetRole)
+                ? `지금 바로 ${roleInfo(targetRole).name} 능력을 사용해야 합니다.`
+                : "복제한 역할의 팀에 소속되며, 지금은 추가 행동이 없습니다.",
+          },
+        });
+        transaction.update(actionRef, { processed: true, processedAt: serverTimestamp() });
+        return;
+      }
+
+      const copied = privateData.copiedRole ?? copiedRole;
+      if (!privateData.copiedAbilityPending || !["seer", "robber", "witch", "troublemaker", "drunk", "minion", "revealer"].includes(copied)) {
+        transaction.update(actionRef, { processed: true, error: "먼저 다른 사람의 역할을 복제해야 합니다." });
+        return;
+      }
+
+      if (copied === "seer" && action.type === "doppel-seer") {
+        const mode = action.payload?.mode;
+        if (mode === "center") {
+          const indices = [...new Set(action.payload?.centerIndices ?? [])].map(Number);
+          if (indices.length !== 2 || indices.some((index) => ![0, 1, 2].includes(index))) {
+            transaction.update(actionRef, { processed: true, error: "중앙 카드 두 장을 선택해야 합니다." });
+            return;
+          }
+          viewInfo = {
+            kind: "roles",
+            title: "도플갱어가 예언자 능력으로 확인한 중앙 카드",
+            cards: indices.map((index) => ({ label: `중앙 카드 ${index + 1}`, role: secrets.centerRoles[index] })),
+          };
+        } else {
+          const targetUid = action.payload?.targetUid;
+          if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+            transaction.update(actionRef, { processed: true, error: "다른 참가자 한 명을 선택해야 합니다." });
+            return;
+          }
+          viewInfo = {
+            kind: "roles",
+            title: "도플갱어가 예언자 능력으로 확인한 카드",
+            cards: [{ labelUid: targetUid, role: currentRoles[targetUid] }],
+          };
+        }
+      } else if (copied === "robber" && action.type === "doppel-robber") {
+        const targetUid = action.payload?.targetUid;
+        if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+          transaction.update(actionRef, { processed: true, error: "교환할 참가자를 선택해야 합니다." });
+          return;
+        }
+        const actorRole = currentRoles[actorUid];
+        const targetRole = currentRoles[targetUid];
+        currentRoles[actorUid] = targetRole;
+        currentRoles[targetUid] = actorRole;
+        transaction.update(gameSecretRef, { currentRoles });
+        transaction.update(actorPrivateRef, { currentRole: targetRole });
+        transaction.update(subRef("private", targetUid), { currentRole: actorRole });
+        viewInfo = {
+          kind: "roles",
+          title: "도플갱어가 강도 능력으로 새로 받은 카드",
+          cards: [{ label: "현재 내 역할 카드", role: targetRole }],
+        };
+      } else if (copied === "troublemaker" && action.type === "doppel-troublemaker") {
+        const targets = [...new Set(action.payload?.targetUids ?? [])];
+        if (targets.length !== 2 || targets.some((uid) => !validateTargetUid(uid, currentRoles, actorUid))) {
+          transaction.update(actionRef, { processed: true, error: "서로 다른 참가자 두 명을 선택해야 합니다." });
+          return;
+        }
+        const [firstUid, secondUid] = targets;
+        const firstRole = currentRoles[firstUid];
+        const secondRole = currentRoles[secondUid];
+        currentRoles[firstUid] = secondRole;
+        currentRoles[secondUid] = firstRole;
+        transaction.update(gameSecretRef, { currentRoles });
+        transaction.update(subRef("private", firstUid), { currentRole: secondRole });
+        transaction.update(subRef("private", secondUid), { currentRole: firstRole });
+        viewInfo = {
+          kind: "players",
+          title: "도플갱어가 말썽쟁이 능력으로 바꾼 참가자",
+          playerUids: targets,
+          text: "카드 내용은 확인할 수 없습니다.",
+        };
+      } else if (copied === "minion" && action.type === "doppel-minion") {
+        const wolfUids = Object.keys(secrets.initialRoles).filter((uid) => secrets.initialRoles[uid] === "werewolf" || secrets.doppelCopies?.[uid] === "werewolf");
+        viewInfo = wolfUids.length
+          ? { kind: "players", title: "도플갱어 하수인이 확인한 늑대인간", playerUids: wolfUids }
+          : { kind: "message", title: "늑대인간 없음", text: "플레이어 중 늑대인간이 없습니다." };
+      } else if (copied === "drunk" && action.type === "doppel-drunk") {
+        const centerIndex = Number(action.payload?.centerIndex);
+        if (![0,1,2].includes(centerIndex)) {
+          transaction.update(actionRef, { processed: true, error: "중앙 카드 한 장을 선택해야 합니다." });
+          return;
+        }
+        const actorRole = currentRoles[actorUid];
+        const newCenterRoles = [...secrets.centerRoles];
+        const targetRole = newCenterRoles[centerIndex];
+        currentRoles[actorUid] = targetRole;
+        newCenterRoles[centerIndex] = actorRole;
+        transaction.update(gameSecretRef, { currentRoles, centerRoles: newCenterRoles });
+        transaction.update(actorPrivateRef, { currentRole: targetRole });
+        viewInfo = { kind: "message", title: "도플갱어가 복제한 주정뱅이", text: "중앙 카드와 바꿨습니다. 새 카드는 확인할 수 없습니다." };
+      } else if (copied === "witch" && action.type === "doppel-witch") {
+        const centerIndex = Number(action.payload?.centerIndex);
+        const swap = Boolean(action.payload?.swap);
+        if (![0,1,2].includes(centerIndex)) {
+          transaction.update(actionRef, { processed: true, error: "중앙 카드 한 장을 선택해야 합니다." });
+          return;
+        }
+        const actorRole = currentRoles[actorUid];
+        const newCenterRoles = [...secrets.centerRoles];
+        const seenRole = newCenterRoles[centerIndex];
+        if (swap) {
+          currentRoles[actorUid] = seenRole;
+          newCenterRoles[centerIndex] = actorRole;
+          transaction.update(gameSecretRef, { currentRoles, centerRoles: newCenterRoles });
+          transaction.update(actorPrivateRef, { currentRole: seenRole });
+        }
+        viewInfo = { kind: "roles", title: "도플갱어가 복제한 마녀", cards: [{ label: `확인한 중앙 카드 ${centerIndex+1}`, role: seenRole }], text: swap ? "확인한 카드와 바꿨습니다." : "확인만 하고 바꾸지 않았습니다." };
+      } else if (copied === "revealer" && action.type === "doppel-revealer") {
+        const targetUid = action.payload?.targetUid;
+        if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+          transaction.update(actionRef, { processed: true, error: "공개할 참가자 한 명을 선택해야 합니다." });
+          return;
+        }
+        const targetRole = currentRoles[targetUid];
+        const publicRole = targetRole !== "werewolf" && targetRole !== "tanner";
+        if (publicRole) {
+          viewInfo = {
+            kind: "roles",
+            title: "도플갱어가 계시자 능력으로 공개한 카드",
+            cards: [{ labelUid: targetUid, role: targetRole }],
+            text: "늑대인간이나 무두장이가 아니므로 밤이 끝난 뒤 모두에게 공개됩니다.",
+          };
+          const publicRevelations = Array.isArray(secrets.publicRevelations) ? [...secrets.publicRevelations] : [];
+          publicRevelations.push({ revealerUid: actorUid, targetUid, role: targetRole, copiedByDoppelganger: true });
+          transaction.update(gameSecretRef, { publicRevelations });
+          transaction.update(roomRef(), { publicRevelations });
+        } else {
+          viewInfo = {
+            kind: "message",
+            title: "도플갱어가 계시자 능력으로 확인한 카드",
+            text: `${playerName(targetUid)}의 직업은 늑대인간 또는 무두장이입니다. 다른 사람에게는 공개되지 않습니다.`,
+          };
+        }
+      } else {
+        transaction.update(actionRef, { processed: true, error: "복제한 역할의 능력과 맞지 않는 행동입니다." });
+        return;
+      }
+
+      transaction.update(actorPrivateRef, {
+        copiedAbilityPending: false,
+        actionResolved: true,
+        actionDone: false,
+        viewInfo,
+      });
+      transaction.update(actionRef, { processed: true, processedAt: serverTimestamp() });
+      return;
+    }
+
+    if (activeRole === "revealer") {
+      const targetUid = action.payload?.targetUid;
+      if (!validateTargetUid(targetUid, currentRoles, actorUid)) {
+        transaction.update(actionRef, { processed: true, error: "공개할 참가자 한 명을 선택해야 합니다." });
+        return;
+      }
+      const targetRole = currentRoles[targetUid];
+      const publicRole = targetRole !== "werewolf" && targetRole !== "tanner";
+      if (publicRole) {
+        viewInfo = {
+          kind: "roles",
+          title: "계시자가 공개한 카드",
+          cards: [{ labelUid: targetUid, role: targetRole }],
+          text: "늑대인간이나 무두장이가 아니므로 밤이 끝난 뒤 모두에게 공개됩니다.",
+        };
+      } else {
+        viewInfo = {
+          kind: "message",
+          title: "계시자가 확인한 카드",
+          text: `${playerName(targetUid)}의 직업은 늑대인간 또는 무두장이입니다. 다른 사람에게는 공개되지 않습니다.`,
+        };
+      }
+      if (publicRole) {
+        const publicRevelations = Array.isArray(secrets.publicRevelations) ? [...secrets.publicRevelations] : [];
+        publicRevelations.push({ revealerUid: actorUid, targetUid, role: targetRole });
+        transaction.update(gameSecretRef, { publicRevelations });
+        transaction.update(roomRef(), { publicRevelations });
+      }
+    }
+
+    transaction.update(actorPrivateRef, {
+      actionResolved: true,
+      actionDone: false,
+      viewInfo,
+    });
+    transaction.update(actionRef, {
+      processed: true,
+      processedAt: serverTimestamp(),
+    });
+  });
+}
+
+async function submitAction(type, payload) {
+  if (!currentUser || !roomData?.nightRole || actionSubmitting) return;
+  if (isHost()) throw new Error("방장은 진행 전용이라 밤 역할 행동을 수행하지 않습니다.");
+  actionSubmitting = true;
+  render();
+  try {
+    await setDoc(subRef("actions", currentUser.uid), {
+      step: roomData.nightRole,
+      type,
+      payload,
+      processed: false,
+      createdAt: serverTimestamp(),
+    });
+  } catch (error) {
+    actionSubmitting = false;
+    render();
+    throw error;
+  }
+}
+
+function currentNightCompletion() {
+  if (!isHost() || !roomData?.nightRole) {
+    return { prepared: false, actors: [], done: 0, total: 0, ready: false };
+  }
+  const activePlayerUids = new Set(players.map((player) => player.uid));
+  const activePrivates = hostPrivates.filter((item) => activePlayerUids.has(item.uid));
+  if (activePrivates.length !== players.length) {
+    return { prepared: false, actors: [], done: 0, total: 0, ready: false };
+  }
+  const prepared = activePrivates.every((item) => item.lastStep === roomData.nightRole);
+  if (!prepared) return { prepared: false, actors: [], done: 0, total: 0, ready: false };
+  const actors = activePrivates.filter((item) =>
+    item.initialRole === roomData.nightRole
+    || ((roomData.nightRole === "werewolf" || roomData.nightRole === "freemason") && item.copiedRole === roomData.nightRole)
+  );
+  const done = actors.filter((item) => item.actionDone).length;
+  return { prepared: true, actors, done, total: actors.length, ready: actors.length > 0 && done === actors.length };
+}
+
+function currentNightStageKey() {
+  if (roomData?.status !== "night") return "";
+  return `${roomData.gameNumber ?? 0}:${roomData.nightIndex ?? -1}:${roomData.nightRole ?? ""}`;
+}
+
+function randomFakeDelay() {
+  // 일부 학교 서버나 로컬 HTTP 환경에서는 Web Crypto 사용이 제한될 수 있으므로
+  // 일반 난수로도 5~7초 지연이 항상 만들어지게 한다.
+  return 5000 + Math.floor(Math.random() * 2001);
+}
+
+function clearNightAdvanceTimer() {
+  window.clearTimeout(nightAdvanceTimer);
+  nightAdvanceTimer = null;
+  nightAdvanceStageKey = "";
+}
+
+function scheduleNightAdvance(delayMs, stageKey) {
+  if (!stageKey || nightAdvanceInFlight) return;
+  if (nightAdvanceTimer && nightAdvanceStageKey === stageKey) return;
+  clearNightAdvanceTimer();
+  nightAdvanceStageKey = stageKey;
+  nightAdvanceTimer = window.setTimeout(() => {
+    nightAdvanceTimer = null;
+    nightAdvanceStageKey = "";
+    advanceNightAutomatically(stageKey).catch((error) => console.error("자동 밤 진행 실패", error));
+  }, delayMs);
+}
+
+function maybeAutoAdvanceNight() {
+  if (!isHost() || roomData?.status !== "night" || !roomData?.nightRole) {
+    clearNightAdvanceTimer();
+    return;
+  }
+  const completion = currentNightCompletion();
+  if (!completion.prepared) return;
+  const stageKey = currentNightStageKey();
+  if (completion.total === 0) {
+    scheduleNightAdvance(randomFakeDelay(), stageKey);
+    return;
+  }
+  if (completion.ready) {
+    scheduleNightAdvance(2800, stageKey);
+    return;
+  }
+  if (nightAdvanceStageKey === stageKey) clearNightAdvanceTimer();
+}
+
+async function advanceNightAutomatically(expectedStageKey) {
+  if (!isHost() || nightAdvanceInFlight) return;
+  nightAdvanceInFlight = true;
+  try {
+    let nextRole = null;
+    let moved = false;
+    let finishedGameNumber = null;
+    await runTransaction(db, async (transaction) => {
+      const roomSnapshot = await transaction.get(roomRef());
+      if (!roomSnapshot.exists()) return;
+      const data = roomSnapshot.data();
+      const actualKey = `${data.gameNumber ?? 0}:${data.nightIndex ?? -1}:${data.nightRole ?? ""}`;
+      if (data.status !== "night" || actualKey !== expectedStageKey) return;
+
+      const currentIndex = NIGHT_ORDER.indexOf(data.nightRole);
+      if (currentIndex < NIGHT_ORDER.length - 1) {
+        nextRole = NIGHT_ORDER[currentIndex + 1];
+        transaction.update(roomRef(), {
+          nightIndex: currentIndex + 1,
+          nightRole: nextRole,
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        // 모든 밤 행동이 끝난 순간의 카드 배치를 최종 역할로 확정한다.
+        // 이후 승패 판정은 처음 역할이 아니라 이 finalRoles만 사용한다.
+        const secretRef = subRef("secrets", "main");
+        const secretSnapshot = await transaction.get(secretRef);
+        if (!secretSnapshot.exists()) throw new Error("게임 역할 정보가 없습니다.");
+        const finalRoles = { ...(secretSnapshot.data().currentRoles ?? {}) };
+        transaction.update(secretRef, {
+          finalRoles,
+          finalRolesLockedAt: serverTimestamp(),
+        });
+        finishedGameNumber = data.gameNumber ?? 0;
+        transaction.update(roomRef(), {
+          status: "discussion",
+          nightIndex: null,
+          nightRole: null,
+          updatedAt: serverTimestamp(),
+        });
+      }
+      moved = true;
+    });
+    if (moved && nextRole) await prepareNightStage(nextRole);
+    if (moved && !nextRole && finishedGameNumber !== null) {
+      // 각 기기에 남아 있는 짧은 클릭 묶음이 Firestore에 반영될 시간을 준다.
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      await finalizeVillageMayor(finishedGameNumber);
+    }
+  } finally {
+    nightAdvanceInFlight = false;
+    // 역할 전환 중 도착한 Firestore 스냅샷은 진행 중 플래그 때문에
+    // 타이머 예약을 건너뛸 수 있다. 전환이 끝난 직후 다시 검사한다.
+    window.setTimeout(() => maybeAutoAdvanceNight(), 0);
+    window.setTimeout(() => maybeAutoAdvanceNight(), 350);
+  }
+}
+
+async function startVoting() {
+  if (!isHost()) return;
+  await deleteSubcollection("votes");
+  await updateDoc(roomRef(), {
+    status: "voting",
+    voteRound: 1,
+    revoteCandidates: [],
+    revoteReason: null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+function currentVoteCandidates() {
+  const candidateUids = roomData?.status === "revote" ? (roomData.revoteCandidates ?? []) : [];
+  const base = candidateUids.length
+    ? players.filter((player) => candidateUids.includes(player.uid))
+    : players;
+  return sortedPlayers(base);
+}
+
+async function castVote(targetUid) {
+  if (!currentUser || !isVotingPhase()) return;
+  if (isHost()) throw new Error("방장은 게임에 참여하지 않아 투표할 수 없습니다.");
+  if (hostVotes.length >= players.length && myVote?.targetUid) throw new Error("모든 투표가 완료되어 더 이상 수정할 수 없습니다.");
+  if (!targetUid || targetUid === currentUser.uid) throw new Error("자기 자신에게는 투표할 수 없습니다.");
+  const allowed = currentVoteCandidates().some((player) => player.uid === targetUid);
+  if (!allowed) throw new Error("현재 투표 대상이 아닙니다.");
+  await setDoc(subRef("votes", currentUser.uid), {
+    voterUid: currentUser.uid,
+    targetUid,
+    round: Number(roomData.voteRound ?? 1),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  uiState.voteTarget = targetUid;
+  showToast(`${playerName(targetUid)}에게 투표했습니다.`);
+}
+
+function calculateOutcome(finalRoles, eliminatedUids, doppelCopies = {}) {
+  const wolfUids = Object.entries(finalRoles)
+    .filter(([, role]) => role === "werewolf")
+    .map(([uid]) => uid);
+  // 도플갱어가 무두장이를 복제했다면 이후 카드가 바뀌더라도 개인전 승리 조건을 유지한다.
+  const copiedTannerUids = new Set(
+    Object.entries(doppelCopies)
+      .filter(([, copiedRole]) => copiedRole === "tanner")
+      .map(([uid]) => uid)
+  );
+  const deadTanners = eliminatedUids.filter((uid) => finalRoles[uid] === "tanner" || copiedTannerUids.has(uid));
+  const deadWolves = eliminatedUids.filter((uid) => finalRoles[uid] === "werewolf");
+  const deadVillage = eliminatedUids.filter((uid) => {
+    const role = finalRoles[uid];
+    return role && role !== "werewolf" && role !== "tanner" && !copiedTannerUids.has(uid);
+  });
+
+  // 승리 우선순위: 무두장이 사망 > 늑대 사망 > 마을 팀 역할 사망 > 아무도 사망하지 않음
+  if (deadTanners.length > 0) {
+    return {
+      villageWin: false,
+      wolfWin: false,
+      tannerWin: true,
+      tannerWinnerUids: deadTanners,
+      outcomeReason: deadTanners.length === 1
+        ? "최종 역할이 무두장이인 참가자가 처형되어 그 무두장이만 승리했습니다."
+        : "최종 역할이 무두장이인 참가자들이 처형되어 처형된 무두장이들만 승리했습니다.",
+    };
+  }
+  if (deadWolves.length > 0) {
+    return { villageWin: true, wolfWin: false, tannerWin: false, outcomeReason: "최종 역할이 늑대인간인 참가자가 처형되어 마을 팀만 승리했습니다." };
+  }
+  if (deadVillage.length > 0) {
+    return { villageWin: false, wolfWin: true, tannerWin: false, outcomeReason: "최종 역할이 마을 팀인 참가자가 처형되어 늑대 팀만 승리했습니다." };
+  }
+  if (wolfUids.length > 0) {
+    return { villageWin: false, wolfWin: true, tannerWin: false, outcomeReason: "아무도 처형되지 않았고 늑대인간이 마을에 남아 늑대 팀이 승리했습니다." };
+  }
+  return { villageWin: true, wolfWin: false, tannerWin: false, outcomeReason: "늑대인간이 모두 중앙에 있고 아무도 처형되지 않아 마을 팀이 승리했습니다." };
+}
+
+async function publishVoteResult() {
+  if (!isHost()) return;
+  const voteSnapshot = await getDocs(subCollection("votes"));
+  if (voteSnapshot.size !== players.length) throw new Error("모든 참가자가 투표를 마칠 때까지 기다려 주세요.");
+
+  const secretSnapshot = await getDoc(subRef("secrets", "main"));
+  if (!secretSnapshot.exists()) throw new Error("게임 역할 정보가 없습니다.");
+  const secretData = secretSnapshot.data();
+  // 강도·말썽쟁이의 교환까지 모두 끝난 뒤 잠근 최종 역할로 판정한다.
+  const finalRoles = secretData.finalRoles ?? secretData.currentRoles;
+  const votes = voteSnapshot.docs.map((item) => item.data());
+  const voteCandidates = currentVoteCandidates();
+  const candidateUidSet = new Set(voteCandidates.map((player) => player.uid));
+  const voteCounts = {};
+  voteCandidates.forEach((player) => { voteCounts[player.uid] = 0; });
+  votes.forEach((vote) => {
+    if (Object.hasOwn(voteCounts, vote.targetUid)) voteCounts[vote.targetUid] += 1;
+  });
+
+  const invalidVote = votes.find((vote) => !candidateUidSet.has(vote.targetUid));
+  if (invalidVote) throw new Error("현재 투표 대상이 아닌 사람에게 투표한 기록이 있습니다. 재투표를 다시 시작해 주세요.");
+
+  const maxVotes = Math.max(...Object.values(voteCounts));
+  const leadingUids = Object.entries(voteCounts)
+    .filter(([, count]) => count === maxVotes)
+    .map(([uid]) => uid);
+
+  if (leadingUids.length > 1) {
+    await deleteSubcollection("votes");
+    await updateDoc(roomRef(), {
+      status: "revote",
+      voteRound: Number(roomData.voteRound ?? 1) + 1,
+      revoteCandidates: leadingUids,
+      revoteReason: `${leadingUids.map((uid) => playerName(uid)).join(", ")} 동률로 재투표를 진행합니다.`,
+      updatedAt: serverTimestamp(),
+    });
+    showToast("동률이 나와 재투표를 시작합니다.");
+    return;
+  }
+
+  const eliminatedUids = leadingUids.length === 1 && maxVotes > 0 ? leadingUids : [];
+  const outcome = calculateOutcome(finalRoles, eliminatedUids, secretData.doppelCopies ?? {});
+
+  const batch = writeBatch(db);
+  batch.set(subRef("results", "main"), {
+    votes,
+    voteCounts,
+    maxVotes,
+    eliminatedUids,
+    finalRoles,
+    voteRound: Number(roomData.voteRound ?? 1),
+    wasRevote: Number(roomData.voteRound ?? 1) > 1,
+    ...outcome,
+    publishedAt: serverTimestamp(),
+  });
+  batch.update(roomRef(), {
+    status: "results",
+    revoteCandidates: [],
+    revoteReason: null,
+    updatedAt: serverTimestamp(),
+  });
+  await batch.commit();
+}
+
+async function revealRoles() {
+  if (!isHost()) return;
+  const [secretSnapshot, resultSnapshot] = await Promise.all([
+    getDoc(subRef("secrets", "main")),
+    getDoc(subRef("results", "main")),
+  ]);
+  if (!secretSnapshot.exists() || !resultSnapshot.exists()) throw new Error("공개할 결과가 없습니다.");
+
+  const secrets = secretSnapshot.data();
+  const result = resultSnapshot.data();
+  const finalRoles = secrets.finalRoles ?? secrets.currentRoles;
+  const winnerUids = result.tannerWin
+    ? [...(result.tannerWinnerUids ?? [])]
+    : Object.entries(finalRoles)
+      .filter(([, role]) => role === "werewolf" ? result.wolfWin : role !== "tanner" && result.villageWin)
+      .map(([uid]) => uid);
+  const revealOrder = sortedPlayers().map((player) => player.uid);
+
+  const batch = writeBatch(db);
+  batch.set(subRef("revealed", "main"), {
+    initialRoles: secrets.initialRoles,
+    finalRoles,
+    centerRoles: secrets.centerRoles,
+    winnerUids,
+    revealOrder,
+    revealedUids: [],
+    revealIndex: 0,
+    revealedAt: serverTimestamp(),
+  });
+  batch.update(roomRef(), {
+    status: "reveal",
+    updatedAt: serverTimestamp(),
+  });
+  await batch.commit();
+}
+
+async function revealCard(uid) {
+  if (!isHost()) return;
+  if (!uid || !getPlayer(uid)) throw new Error("공개할 참가자 카드를 찾을 수 없습니다.");
+  await runTransaction(db, async (transaction) => {
+    const revealRef = subRef("revealed", "main");
+    const revealSnapshot = await transaction.get(revealRef);
+    if (!revealSnapshot.exists()) throw new Error("공개할 카드 정보가 없습니다.");
+    const data = revealSnapshot.data();
+    const revealOrder = Array.isArray(data.revealOrder) ? data.revealOrder : sortedPlayers().map((player) => player.uid);
+    if (!revealOrder.includes(uid)) throw new Error("공개 대상이 아닌 카드입니다.");
+    const legacyIndex = Math.min(Number(data.revealIndex ?? 0), revealOrder.length);
+    const legacyRevealed = revealOrder.slice(0, legacyIndex);
+    const revealedUids = Array.isArray(data.revealedUids) ? data.revealedUids : legacyRevealed;
+    if (revealedUids.includes(uid)) return;
+    const nextRevealedUids = [...revealedUids, uid];
+    transaction.update(revealRef, {
+      revealedUids: nextRevealedUids,
+      revealIndex: nextRevealedUids.length,
+      lastRevealedUid: uid,
+      updatedAt: serverTimestamp(),
+    });
+  });
+}
+
+async function resetToLobby() {
+  if (!isHost()) return;
+  await Promise.all([
+    deleteSubcollection("private"),
+    deleteSubcollection("actions"),
+    deleteSubcollection("votes"),
+    deleteSubcollection("secrets"),
+    deleteSubcollection("results"),
+    deleteSubcollection("revealed"),
+    deleteSubcollection("wolfClicks"),
+  ]);
+  myWolfHuntCount = 0;
+  localWolfHuntCount = 0;
+  pendingWolfHuntClicks = 0;
+  await updateDoc(roomRef(), {
+    status: "lobby",
+    nightIndex: null,
+    nightRole: null,
+    mayorResolved: false,
+    mayorUid: null,
+    mayorCount: 0,
+    mayorTieCount: 0,
+    voteRound: null,
+    revoteCandidates: [],
+    revoteReason: null,
+    publicRevelations: [],
+    updatedAt: serverTimestamp(),
+  });
+}
+
+function renderChatPanel() {
+  if (!roomCode || !roomData) return "";
+  const locked = isChatLocked();
+  const messagesHtml = chatError
+    ? `<div class="chat-empty">⚠️ ${escapeHtml(chatError)}<br>새 보안 규칙을 게시한 뒤 새로고침해 주세요.</div>`
+    : chatMessages.length
+    ? chatMessages.map((message) => {
+        const mine = message.senderUid === currentUser?.uid;
+        const senderName = message.senderName || playerName(message.senderUid);
+        return `
+          <div class="chat-message ${mine ? "mine" : ""}">
+            <div class="chat-message-head">
+              <strong>${escapeHtml(senderName)}${mine ? " (나)" : ""}</strong>
+              <span>${escapeHtml(formatChatTime(message.createdAt))}</span>
+            </div>
+            <div class="chat-bubble">${escapeHtml(message.text)}</div>
+          </div>
+        `;
+      }).join("")
+    : '<div class="chat-empty">아직 메시지가 없습니다.<br>첫 메시지를 보내 보세요.</div>';
+
+  return `
+    <section class="card section chat-card">
+      <div class="chat-head">
+        <h3>💬 방 채팅</h3>
+        <span class="badge">최근 100개</span>
+      </div>
+      <div id="chat-messages" class="chat-messages" aria-live="polite">${messagesHtml}</div>
+      <form id="chat-form" class="chat-form" autocomplete="off">
+        <input
+          id="chat-input"
+          name="message"
+          maxlength="120"
+          value="${escapeHtml(uiState.chatDraft)}"
+          placeholder="${locked ? "밤 행동 중에는 채팅이 잠깁니다" : "메시지를 입력하세요"}"
+          aria-label="채팅 메시지"
+          ${locked || chatSending ? "disabled" : ""}
+        />
+        <button class="btn chat-send" type="submit" ${locked || chatSending ? "disabled" : ""}>${chatSending ? "전송 중" : "전송"}</button>
+      </form>
+      <p class="chat-notice ${locked ? "chat-locked" : ""}">${locked ? "🌙 역할 정보 보호를 위해 밤 행동 중에는 새 메시지를 보낼 수 없습니다." : "메시지는 같은 방의 모든 참가자에게 실시간으로 표시됩니다."}</p>
+    </section>
+  `;
+}
+
+function pageFrame(content) {
+  return `
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">🌕</span><span>한밤의 늑대인간</span></div>
+      ${roomCode ? `<button class="room-chip" data-action="copy-code" title="방 코드 복사">${escapeHtml(roomCode)}</button>` : ""}
+    </div>
+    ${content}
+    ${roomCode ? renderChatPanel() : ""}
+    ${roomCode && isHost() ? `
+      <section class="card section room-delete-panel">
+        <button class="btn danger full" data-action="delete-room">💥 방 폭파 · 처음 화면으로</button>
+        <p class="muted center" style="margin:8px 0 0">게임 중에도 사용할 수 있습니다. 모든 참가자가 즉시 처음 화면으로 이동하고 방 데이터가 정리됩니다.</p>
+      </section>
+    ` : ""}
+  `;
+}
+
+function renderLanding() {
+  const savedNickname = localStorage.getItem("onw_nickname") ?? "";
+  return pageFrame(`
+    <section class="card hero">
+      <div class="moon">🌕</div>
+      <h1>한밤의 늑대인간</h1>
+      <p class="hero-sub">방장은 진행 전용, 플레이어는 각자의 기기로 접속해 밤 행동부터 투표까지 진행하세요.</p>
+      <form id="entry-form" class="form-grid">
+        <div class="field">
+          <label for="nickname">닉네임</label>
+          <input id="nickname" name="nickname" maxlength="12" autocomplete="nickname" value="${escapeHtml(savedNickname)}" placeholder="닉네임 입력" required />
+        </div>
+        <div class="field">
+          <label for="room-code">방 코드</label>
+          <input id="room-code" class="room-input" name="roomCode" maxlength="4" autocomplete="off" placeholder="ABCD" />
+        </div>
+        <div class="button-row">
+          <button class="btn" type="submit" name="mode" value="create">새 방 만들기</button>
+          <button class="btn secondary" type="submit" name="mode" value="join">방 입장하기</button>
+        </div>
+      </form>
+    </section>
+    <section class="card section">
+      <h3>지원 인원과 역할</h3>
+      <p>플레이어 3~16인용 · 방장은 인원에서 제외 · 역할 카드 미배정 · 투표 미참여</p>
+      <p>방장이 역할 카드 수를 직접 설정하고 남는 카드는 마을주민으로 자동 배정됩니다.</p>
+      <p class="muted" style="margin-bottom:0">모든 기기에서 Firebase 익명 로그인과 Firestore 연결이 필요합니다.</p>
+    </section>
+  `);
+}
+
+function renderPlayerList() {
+  return `
+    <div class="player-list">
+      <div class="player-item" style="border:1px solid rgba(245, 158, 11, .28)">
+        <span class="player-name">${escapeHtml(roomData?.hostNickname || "방장")} ${isHost() ? "(나)" : ""}</span>
+        <span class="badge host">방장 · 진행 전용</span>
+      </div>
+      ${sortedPlayers().map((player) => `
+        <div class="player-item">
+          <span class="player-name">${escapeHtml(player.nickname)} ${player.uid === currentUser.uid ? "(나)" : ""}</span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="badge">플레이어</span>
+            ${isHost() && roomData?.status === "lobby"
+              ? `<button class="btn danger small" data-action="kick-player" data-uid="${escapeHtml(player.uid)}">강퇴</button>`
+              : ""}
+          </span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderRoleConfigPanel() {
+  const config = normalizeRoleConfig(roomData?.roleConfig);
+  const plan = getDeckPlan(players.length, config);
+  const roleRows = CONFIGURABLE_ROLES.map((role) => {
+    const info = roleInfo(role);
+    const count = config[role];
+    return `
+      <div class="role-config-row">
+        <div class="role-config-meta">
+          <span class="role-config-icon">${info.icon}</span>
+          <div><strong>${info.name}</strong><span>${role === "freemason" ? "여러 장 설정 가능" : "카드 수 직접 설정"}</span></div>
+        </div>
+        <div class="role-counter">
+          <button class="counter-btn" data-action="change-role-count" data-role="${role}" data-delta="-1" ${count <= 0 ? "disabled" : ""}>−</button>
+          <strong>${count}</strong>
+          <button class="counter-btn" data-action="change-role-count" data-role="${role}" data-delta="1" ${count >= MAX_CARDS ? "disabled" : ""}>＋</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const warning = plan.excess > 0
+    ? `<div class="deck-warning">⚠️ 현재 참가자 기준 특수 역할 카드가 <strong>${plan.excess}장 초과</strong>했습니다. 역할 수를 줄이거나 참가자를 더 받아 주세요.</div>`
+    : `<div class="deck-ok">✅ 남은 ${plan.villagerCount}장은 마을주민 카드로 자동 배정됩니다.</div>`;
+
+  return `
+    <div class="role-config-panel">
+      <div class="role-config-heading">
+        <div><h3>🎴 역할 카드 구성</h3><p>방장만 변경할 수 있습니다.</p></div>
+        <span class="deck-total">총 ${plan.totalCards}장</span>
+      </div>
+      <div class="role-config-grid">${roleRows}</div>
+      <div class="villager-auto-row">
+        <div class="role-config-meta">
+          <span class="role-config-icon">🏠</span>
+          <div><strong>마을주민</strong><span>남은 카드 자동 채움</span></div>
+        </div>
+        <strong class="villager-auto-count">${plan.villagerCount}장</strong>
+      </div>
+      ${warning}
+      <p class="deck-formula">플레이어 ${players.length}명 + 중앙 카드 3장 = 총 ${plan.totalCards}장 · 방장은 카드 미배정</p>
+    </div>
+  `;
+}
+
+function renderRoleSummary() {
+  const config = normalizeRoleConfig(roomData?.roleConfig);
+  const plan = getDeckPlan(players.length, config);
+  const chips = CONFIGURABLE_ROLES
+    .filter((role) => config[role] > 0)
+    .map((role) => `<span class="deck-chip">${roleInfo(role).icon} ${roleInfo(role).name} ${config[role]}</span>`)
+    .join("");
+  return `
+    <div class="role-config-panel compact">
+      <div class="role-config-heading"><div><h3>🎴 방장이 선택한 카드</h3><p>인원 변동에 따라 마을주민 수는 자동 계산됩니다.</p></div><span class="deck-total">총 ${plan.totalCards}장</span></div>
+      <div class="deck-chip-list">${chips}<span class="deck-chip">🏠 마을주민 ${plan.villagerCount}</span></div>
+      ${plan.excess > 0 ? `<div class="deck-warning">방장이 카드 구성을 조정하고 있습니다.</div>` : ""}
+    </div>
+  `;
+}
+
+function renderLobby() {
+  const count = players.length;
+  const plan = getDeckPlan(count, normalizeRoleConfig(roomData?.roleConfig));
+  const canStart = plan.valid;
+  let startMessage = "모두 준비되면 시작하세요.";
+  if (count < MIN_PLAYERS) startMessage = `게임 시작까지 ${MIN_PLAYERS - count}명이 더 필요합니다.`;
+  else if (count > MAX_PLAYERS) startMessage = `최대 ${MAX_PLAYERS}명까지 참여할 수 있습니다.`;
+  else if (plan.excess > 0) startMessage = `특수 역할 카드가 ${plan.excess}장 너무 많습니다.`;
+
+  return pageFrame(`
+    <section class="card">
+      <div class="status-banner">
+        <strong>대기실</strong>
+        <span>방 코드를 친구들에게 알려 주세요.</span>
+      </div>
+      <div class="center">
+        <p style="margin-bottom:6px">현재 플레이어 · 방장 제외</p>
+        <h2>${count}명 / ${MAX_PLAYERS}명</h2>
+      </div>
+      ${renderPlayerList()}
+      <div class="divider"></div>
+      ${isHost() ? renderRoleConfigPanel() : renderRoleSummary()}
+      <div class="divider"></div>
+      ${isHost() ? `
+        <button class="btn full" data-action="start-game" ${canStart ? "" : "disabled"}>게임 시작</button>
+        <p class="center muted" style="margin:10px 0 0">${startMessage}</p>
+      ` : '<p class="center muted" style="margin-bottom:0">방장이 역할 카드 구성을 마치고 게임을 시작할 때까지 기다려 주세요.</p>'}
+      ${!isHost() ? `
+        <div class="spacer"></div>
+        <button class="btn secondary full" data-action="leave-room">방 나가기</button>
+      ` : `
+        <div class="action-box center" style="margin-top:16px">
+          <strong>🎙️ 방장 모드</strong>
+          <p style="margin-bottom:0">방장은 역할 카드, 밤 행동, 늑대 퇴치, 투표에 참여하지 않습니다.</p>
+        </div>
+      `}
+    </section>
+  `);
+}
+
+function renderRoleCard(role) {
+  const info = roleInfo(role);
+  if (!roleVisible) {
+    return `
+      <button class="role-card role-hidden" data-action="show-role" style="width:100%; color:inherit">
+        <div>
+          <div class="role-icon">🌑</div>
+          <div class="role-name">내 역할 확인</div>
+          <div class="role-description">주변 사람에게 보이지 않도록 화면을 가린 뒤 눌러 주세요.</div>
+        </div>
+      </button>
+    `;
+  }
+  return `
+    <div class="role-card">
+      <div>
+        <div class="role-icon">${info.icon}</div>
+        <div class="role-name">${info.name}</div>
+        <div class="role-description">${info.description}</div>
+        <button class="btn secondary small" data-action="hide-role" style="margin-top:14px">역할 다시 가리기</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderViewInfo(viewInfo) {
+  if (!viewInfo) return "";
+  let body = "";
+  if (viewInfo.kind === "message") {
+    body = `<p>${escapeHtml(viewInfo.text)}</p>`;
+  }
+  if (viewInfo.kind === "players") {
+    const names = (viewInfo.playerUids ?? []).map((uid) => escapeHtml(playerName(uid))).join(", ");
+    body = `<p><strong>${names || "없음"}</strong></p>${viewInfo.text ? `<p class="muted">${escapeHtml(viewInfo.text)}</p>` : ""}`;
+  }
+  if (viewInfo.kind === "roles") {
+    body = (viewInfo.cards ?? []).map((card) => {
+      const info = roleInfo(card.role);
+      const label = card.labelUid ? playerName(card.labelUid) : card.label;
+      return `<p><strong>${escapeHtml(label)}</strong> · ${info.icon} ${info.name}</p>`;
+    }).join("");
+    if (viewInfo.text) body += `<p class="muted">${escapeHtml(viewInfo.text)}</p>`;
+  }
+  return `
+    <div class="action-result">
+      <h3>${escapeHtml(viewInfo.title ?? "확인 결과")}</h3>
+      ${body}
+    </div>
+  `;
+}
+
+function renderPlayerOptions({ selected = [], max = 1, actionName = "select-player", candidates = null } = {}) {
+  const baseCandidates = candidates ? sortedPlayers(candidates) : sortedPlayers();
+  const visibleCandidates = baseCandidates.filter((player) => player.uid !== currentUser.uid);
+  return `
+    <div class="option-grid">
+      ${visibleCandidates.map((player) => `
+        <button class="option ${selected.includes(player.uid) ? "selected" : ""}" data-action="${actionName}" data-uid="${player.uid}" data-max="${max}">
+          ${escapeHtml(player.nickname)}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderCenterOptions({ selected = [], max = 1, actionName = "select-center" } = {}) {
+  return `
+    <div class="option-grid three">
+      ${[0, 1, 2].map((index) => `
+        <button class="option ${selected.includes(index) ? "selected" : ""}" data-action="${actionName}" data-index="${index}" data-max="${max}">
+          중앙 카드 ${index + 1}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderRevealerAnnouncement() {
+  const revelations = Array.isArray(roomData?.publicRevelations) ? roomData.publicRevelations : [];
+  if (!revelations.length || roomData?.status === "night" || roomData?.status === "lobby") return "";
+  return `
+    <div class="action-box center">
+      <h3>📣 계시자가 밤에 활동했습니다</h3>
+      ${revelations.map((item) => {
+        const info = roleInfo(item.role);
+        return `<p><strong>${escapeHtml(playerName(item.targetUid))}</strong>의 직업은 ${info.icon} <strong>${info.name}</strong>이었습니다.</p>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderNightAction() {
+  if (!myPrivate) return '<div class="action-box center"><p>역할 정보를 불러오는 중입니다.</p></div>';
+  const activeRole = roomData.nightRole;
+  const isMyTurn = myPrivate.initialRole === activeRole
+    || ((activeRole === "werewolf" || activeRole === "freemason" || activeRole === "insomniac") && myPrivate.copiedRole === activeRole);
+
+  if (!isMyTurn) {
+    return `
+      <div class="action-box center night-working">
+        <div class="working-moon">🌙</div>
+        <h3>${roleInfo(activeRole).name} 역할 수행 중<span class="working-dots">...</span></h3>
+        <p style="margin-bottom:0">해당 역할의 행동이 끝나면 자동으로 다음 순서로 넘어갑니다.</p>
+      </div>
+    `;
+  }
+
+  if (myPrivate.actionDone) {
+    return `
+      <div class="action-box center handoff-box">
+        <div class="role-icon">✅</div>
+        <h3>나의 역할이 끝났습니다</h3>
+        <p class="handoff-message">화면을 가리고 다른 사람에게 넘겨 주세요.</p>
+        <p class="muted" style="margin-bottom:0">다음 역할은 잠시 후 자동으로 시작됩니다.</p>
+      </div>
+    `;
+  }
+
+  if (myPrivate.actionResolved) {
+    return `
+      <div class="action-box">
+        <h3>행동 결과를 확인하세요</h3>
+        <p>내용을 충분히 확인한 뒤 아래 버튼을 눌러 주세요.</p>
+        ${renderViewInfo(myPrivate.viewInfo)}
+        <div class="spacer"></div>
+        <button class="btn success full" data-action="finish-role" ${actionSubmitting ? "disabled" : ""}>나의 역할 끝내기</button>
+        ${actionSubmitting ? '<p class="warning-text center">완료 처리 중입니다.</p>' : ""}
+      </div>
+    `;
+  }
+
+  const pendingText = actionSubmitting ? '<p class="warning-text center">행동을 처리하고 있습니다.</p>' : "";
+
+  if (activeRole === "werewolf") {
+    return `
+      <div class="action-box">
+        <h3>혼자 남은 늑대인간</h3>
+        <p>중앙 카드 한 장을 선택해 확인하세요.</p>
+        ${renderViewInfo(myPrivate.viewInfo)}
+        ${renderCenterOptions({ selected: uiState.selectedCenters, max: 1 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-wolf" ${uiState.selectedCenters.length === 1 && !actionSubmitting ? "" : "disabled"}>선택한 카드 확인</button>
+        ${pendingText}
+      </div>
+    `;
+  }
+
+  if (activeRole === "seer") {
+    const centerMode = uiState.seerMode === "center";
+    const ready = centerMode ? uiState.selectedCenters.length === 2 : uiState.selectedPlayers.length === 1;
+    return `
+      <div class="action-box">
+        <h3>예언자의 선택</h3>
+        <p>다른 사람 한 명 또는 중앙 카드 두 장을 확인할 수 있습니다.</p>
+        <div class="tab-row">
+          <button class="tab ${!centerMode ? "active" : ""}" data-action="seer-mode" data-mode="player">다른 사람 1장</button>
+          <button class="tab ${centerMode ? "active" : ""}" data-action="seer-mode" data-mode="center">중앙 카드 2장</button>
+        </div>
+        ${centerMode
+          ? renderCenterOptions({ selected: uiState.selectedCenters, max: 2 })
+          : renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-seer" ${ready && !actionSubmitting ? "" : "disabled"}>카드 확인</button>
+        ${pendingText}
+      </div>
+    `;
+  }
+
+  if (activeRole === "robber") {
+    return `
+      <div class="action-box">
+        <h3>강도의 선택</h3>
+        <p>카드를 바꿀 참가자 한 명을 선택하세요.</p>
+        ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-robber" ${uiState.selectedPlayers.length === 1 && !actionSubmitting ? "" : "disabled"}>카드 바꾸기</button>
+        ${pendingText}
+      </div>
+    `;
+  }
+
+  if (activeRole === "witch") {
+    const savedIndex = Number(myPrivate.witchCenterIndex ?? myPrivate.viewInfo?.witchCenterIndex);
+    if ([0, 1, 2].includes(savedIndex)) {
+      return `
+        <div class="action-box">
+          <h3>마녀의 선택</h3>
+          ${renderViewInfo(myPrivate.viewInfo)}
+          <p>확인한 카드와 자신의 카드를 바꿀지 선택하세요.</p>
+          <div class="button-row">
+            <button class="btn success" data-action="submit-witch-swap" data-index="${savedIndex}" ${actionSubmitting ? "disabled" : ""}>바꾸기</button>
+            <button class="btn secondary" data-action="submit-witch-keep" data-index="${savedIndex}" ${actionSubmitting ? "disabled" : ""}>안 바꾸기</button>
+          </div>
+          ${pendingText}
+        </div>`;
+    }
+    return `
+      <div class="action-box">
+        <h3>마녀의 선택</h3>
+        <p>중앙 카드 한 장을 먼저 확인하세요.</p>
+        ${renderCenterOptions({ selected: uiState.selectedCenters, max: 1 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-witch-view" ${uiState.selectedCenters.length === 1 && !actionSubmitting ? "" : "disabled"}>카드 확인</button>
+        ${pendingText}
+      </div>`;
+  }
+
+  if (activeRole === "drunk") {
+    return `
+      <div class="action-box">
+        <h3>주정뱅이의 선택</h3>
+        <p>중앙 카드 한 장과 반드시 바꿉니다. 바꾼 카드는 볼 수 없습니다.</p>
+        ${renderCenterOptions({ selected: uiState.selectedCenters, max: 1 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-drunk" ${uiState.selectedCenters.length === 1 && !actionSubmitting ? "" : "disabled"}>선택한 카드와 바꾸기</button>
+        ${pendingText}
+      </div>`;
+  }
+
+  if (activeRole === "troublemaker") {
+    return `
+      <div class="action-box">
+        <h3>말썽쟁이의 선택</h3>
+        <p>자신을 제외한 참가자 두 명을 선택하세요.</p>
+        ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 2 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-troublemaker" ${uiState.selectedPlayers.length === 2 && !actionSubmitting ? "" : "disabled"}>두 사람의 카드 바꾸기</button>
+        ${pendingText}
+      </div>
+    `;
+  }
+
+  if (activeRole === "doppelganger") {
+    const copied = myPrivate.copiedRole;
+    if (!copied) {
+      return `
+        <div class="action-box">
+          <h3>도플갱어의 선택</h3>
+          <p>다른 참가자 한 명의 역할을 보고 그 역할과 팀, 능력을 복제합니다.</p>
+          ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+          <div class="spacer"></div>
+          <button class="btn full" data-action="submit-doppel-copy" ${uiState.selectedPlayers.length === 1 && !actionSubmitting ? "" : "disabled"}>역할 복제하기</button>
+          ${pendingText}
+        </div>
+      `;
+    }
+
+    if (myPrivate.copiedAbilityPending && copied === "seer") {
+      const centerMode = uiState.seerMode === "center";
+      const ready = centerMode ? uiState.selectedCenters.length === 2 : uiState.selectedPlayers.length === 1;
+      return `
+        <div class="action-box">
+          <h3>복제한 예언자 능력 사용</h3>
+          ${renderViewInfo(myPrivate.viewInfo)}
+          <div class="tab-row">
+            <button class="tab ${!centerMode ? "active" : ""}" data-action="seer-mode" data-mode="player">다른 사람 1장</button>
+            <button class="tab ${centerMode ? "active" : ""}" data-action="seer-mode" data-mode="center">중앙 카드 2장</button>
+          </div>
+          ${centerMode ? renderCenterOptions({ selected: uiState.selectedCenters, max: 2 }) : renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+          <div class="spacer"></div>
+          <button class="btn full" data-action="submit-doppel-seer" ${ready && !actionSubmitting ? "" : "disabled"}>예언자 능력 사용</button>
+          ${pendingText}
+        </div>
+      `;
+    }
+
+    if (myPrivate.copiedAbilityPending && copied === "robber") {
+      return `
+        <div class="action-box">
+          <h3>복제한 강도 능력 사용</h3>
+          ${renderViewInfo(myPrivate.viewInfo)}
+          ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+          <div class="spacer"></div>
+          <button class="btn full" data-action="submit-doppel-robber" ${uiState.selectedPlayers.length === 1 && !actionSubmitting ? "" : "disabled"}>카드 바꾸기</button>
+          ${pendingText}
+        </div>
+      `;
+    }
+
+    if (myPrivate.copiedAbilityPending && copied === "troublemaker") {
+      return `
+        <div class="action-box">
+          <h3>복제한 말썽쟁이 능력 사용</h3>
+          ${renderViewInfo(myPrivate.viewInfo)}
+          ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 2 })}
+          <div class="spacer"></div>
+          <button class="btn full" data-action="submit-doppel-troublemaker" ${uiState.selectedPlayers.length === 2 && !actionSubmitting ? "" : "disabled"}>두 사람의 카드 바꾸기</button>
+          ${pendingText}
+        </div>
+      `;
+    }
+
+    if (myPrivate.copiedAbilityPending && copied === "minion") {
+      return `<div class="action-box"><h3>복제한 하수인 능력</h3><p>즉시 늑대인간을 확인합니다.</p><button class="btn full" data-action="submit-doppel-minion" ${actionSubmitting ? "disabled" : ""}>늑대인간 확인</button>${pendingText}</div>`;
+    }
+    if (myPrivate.copiedAbilityPending && copied === "drunk") {
+      return `<div class="action-box"><h3>복제한 주정뱅이 능력</h3><p>중앙 카드 한 장과 반드시 바꿉니다. 새 카드는 볼 수 없습니다.</p>${renderCenterOptions({ selected: uiState.selectedCenters, max: 1 })}<div class="spacer"></div><button class="btn full" data-action="submit-doppel-drunk" ${uiState.selectedCenters.length===1&&!actionSubmitting?"":"disabled"}>카드 바꾸기</button>${pendingText}</div>`;
+    }
+    if (myPrivate.copiedAbilityPending && copied === "witch") {
+      return `<div class="action-box"><h3>복제한 마녀 능력</h3><p>중앙 카드 한 장을 확인하고 바꿀지 선택하세요.</p>${renderCenterOptions({ selected: uiState.selectedCenters, max: 1 })}<div class="button-row"><button class="btn success" data-action="submit-doppel-witch-swap" ${uiState.selectedCenters.length===1&&!actionSubmitting?"":"disabled"}>확인하고 바꾸기</button><button class="btn secondary" data-action="submit-doppel-witch-keep" ${uiState.selectedCenters.length===1&&!actionSubmitting?"":"disabled"}>확인만 하기</button></div>${pendingText}</div>`;
+    }
+
+    if (myPrivate.copiedAbilityPending && copied === "revealer") {
+      return `
+        <div class="action-box">
+          <h3>복제한 계시자 능력 사용</h3>
+          ${renderViewInfo(myPrivate.viewInfo)}
+          <p>다른 사람 한 명의 직업을 확인하세요. 늑대인간이나 무두장이가 아니면 밤이 끝난 뒤 모두에게 공개됩니다.</p>
+          ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+          <div class="spacer"></div>
+          <button class="btn full" data-action="submit-doppel-revealer" ${uiState.selectedPlayers.length === 1 && !actionSubmitting ? "" : "disabled"}>계시자 능력 사용</button>
+          ${pendingText}
+        </div>
+      `;
+    }
+  }
+
+  if (activeRole === "revealer") {
+    return `
+      <div class="action-box">
+        <h3>계시자의 선택</h3>
+        <p>다른 사람 한 명의 직업을 확인하세요. 늑대인간이나 무두장이가 아니면 밤이 끝난 뒤 모두에게 공개됩니다.</p>
+        ${renderPlayerOptions({ selected: uiState.selectedPlayers, max: 1 })}
+        <div class="spacer"></div>
+        <button class="btn full" data-action="submit-revealer" ${uiState.selectedPlayers.length === 1 && !actionSubmitting ? "" : "disabled"}>직업 확인</button>
+        ${pendingText}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="action-box center">
+      <p>역할 정보를 준비하고 있습니다.</p>
+    </div>
+  `;
+}
+
+function renderWolfHuntPanel() {
+  return `
+    <div class="wolf-hunt-panel">
+      <div class="wolf-hunt-copy">
+        <strong>🪓 늑대 퇴치 작전</strong>
+        <span>역할과 상관없이 마음껏 눌러 주세요.</span>
+      </div>
+      <button class="wolf-hunt-btn" data-action="wolf-hunt" type="button" aria-label="늑대 퇴치 버튼">
+        <span class="wolf-hunt-icon">🐺💥</span>
+        <span>늑대 퇴치</span>
+        <small>내 기록 <b id="wolf-hunt-count">${localWolfHuntCount}회</b></small>
+      </button>
+    </div>
+  `;
+}
+
+function renderMayorBanner() {
+  if (roomData?.status === "night" || roomData?.status === "lobby") return "";
+  if (!roomData?.mayorResolved) {
+    return `
+      <div class="mayor-banner pending">
+        <span class="mayor-crown">👑</span>
+        <div><strong>마을이장 집계 중...</strong><span>밤의 늑대 퇴치 기록을 확인하고 있습니다.</span></div>
+      </div>
+    `;
+  }
+  if (!roomData?.mayorUid) {
+    return `
+      <div class="mayor-banner empty">
+        <span class="mayor-crown">👑</span>
+        <div><strong>오늘은 마을이장이 없습니다</strong><span>밤에 늑대 퇴치 버튼을 누른 사람이 없었습니다.</span></div>
+      </div>
+    `;
+  }
+  const tieText = Number(roomData.mayorTieCount ?? 0) > 1 ? " · 동률자 중 추첨" : "";
+  return `
+    <div class="mayor-banner">
+      <span class="mayor-crown">👑</span>
+      <div>
+        <strong>오늘의 마을이장: ${escapeHtml(playerName(roomData.mayorUid))}</strong>
+        <span>늑대 퇴치 ${Number(roomData.mayorCount ?? 0)}회${tieText} · 직업 및 승패와는 무관합니다.</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderNight() {
+  const activeInfo = roleInfo(roomData.nightRole);
+  if (isHost()) {
+    return pageFrame(`
+      <section class="card">
+        <div class="status-banner center night-status-simple">
+          <strong>${activeInfo.icon} ${activeInfo.name} 역할 수행 중<span class="working-dots">...</span></strong>
+        </div>
+        <div class="action-box center night-working">
+          <div class="role-icon">🎙️</div>
+          <h3>방장은 진행 전용입니다</h3>
+          <p>플레이어들의 역할 행동이 끝나면 다음 역할로 자동 전환됩니다.</p>
+          <p class="muted" style="margin-bottom:0">역할 카드와 늑대 퇴치 버튼은 방장에게 배정되지 않습니다.</p>
+        </div>
+      </section>
+    `);
+  }
+  return pageFrame(`
+    <section class="card">
+      <div class="status-banner center night-status-simple">
+        <strong>${activeInfo.icon} ${activeInfo.name} 역할 수행 중<span class="working-dots">...</span></strong>
+      </div>
+      ${renderRoleCard(myPrivate?.initialRole)}
+      ${renderNightAction()}
+      ${renderWolfHuntPanel()}
+    </section>
+  `);
+}
+
+function renderDiscussion() {
+  return pageFrame(`
+    <section class="card">
+      <div class="status-banner">
+        <strong>💬 토론 시간</strong>
+        <span>시간제한 없이 서로의 주장을 확인하세요.</span>
+      </div>
+      ${renderMayorBanner()}
+      ${renderRevealerAnnouncement()}
+      ${!isHost() ? renderRoleCard(myPrivate?.initialRole) : `
+        <div class="action-box center"><strong>🎙️ 방장 진행 화면</strong><p style="margin-bottom:0">방장은 토론을 지켜보고 투표 시작 시점만 결정합니다.</p></div>
+      `}
+      <div class="action-box center">
+        <h3>누가 늑대인간일까요?</h3>
+        <p>처음 역할과 현재 역할은 카드 교환 때문에 달라졌을 수 있습니다.</p>
+      </div>
+      ${isHost() ? `
+        <div class="host-panel">
+          <h3>토론이 끝났나요?</h3>
+          <button class="btn danger full" data-action="start-voting">투표 시작</button>
+        </div>
+      ` : '<p class="center muted" style="margin-top:14px">방장이 투표를 시작할 때까지 토론하세요.</p>'}
+    </section>
+  `);
+}
+
+function renderVoting() {
+  const submittedCount = hostVotes.length;
+  const allVotesDone = players.length > 0 && submittedCount >= players.length;
+  const isRevote = roomData?.status === "revote";
+  const candidates = currentVoteCandidates();
+  const candidateNames = candidates.map((player) => player.nickname).join(", ");
+  if (isHost()) {
+    return pageFrame(`
+      <section class="card">
+        <div class="status-banner">
+          <strong>${isRevote ? "🔁 동률 재투표" : "🗳️ 투표"}</strong>
+          <span>${isRevote ? `동률자만 투표 대상입니다: ${escapeHtml(candidateNames)}` : "방장은 투표하지 않습니다. 플레이어들의 투표 완료를 기다리세요."}</span>
+        </div>
+        ${renderMayorBanner()}
+        ${renderRevealerAnnouncement()}
+        ${isRevote && roomData?.revoteReason ? `<div class="action-box center"><strong>${escapeHtml(roomData.revoteReason)}</strong></div>` : ""}
+        <div class="host-panel">
+          <h3>${isRevote ? `재투표 현황 · ${Number(roomData.voteRound ?? 2)}차` : "투표 현황"}</h3>
+          <p>${submittedCount}명 / ${players.length}명 투표 완료</p>
+          <div class="progress-line"><div class="progress-fill" style="width:${players.length ? Math.round(submittedCount / players.length * 100) : 0}%"></div></div>
+          <button class="btn full" data-action="publish-result" ${submittedCount === players.length ? "" : "disabled"}>${isRevote ? "재투표 결과 확인" : "투표 결과 확인"}</button>
+        </div>
+      </section>
+    `);
+  }
+
+  const voted = Boolean(myVote?.targetUid);
+  const selected = uiState.voteTarget ?? myVote?.targetUid ?? null;
+  const canEdit = !allVotesDone;
+  return pageFrame(`
+    <section class="card">
+      <div class="status-banner">
+        <strong>${isRevote ? "🔁 동률 재투표" : "🗳️ 투표"}</strong>
+        <span>${isRevote ? "동률자 중 한 명에게 다시 투표하세요." : "늑대인간이라고 생각하는 플레이어를 선택하세요."}</span>
+      </div>
+      ${renderMayorBanner()}
+      ${renderRevealerAnnouncement()}
+      ${isRevote && roomData?.revoteReason ? `<div class="action-box center"><strong>${escapeHtml(roomData.revoteReason)}</strong></div>` : ""}
+      ${voted ? `
+        <div class="action-box center">
+          <div class="role-icon">✅</div>
+          <h3>${allVotesDone ? "투표 종료" : "투표 완료"}</h3>
+          <p><strong>${escapeHtml(playerName(myVote.targetUid))}</strong>에게 투표했습니다.</p>
+          ${!allVotesDone ? "<p>아직 모든 투표가 끝나지 않아 아래에서 수정할 수 있습니다.</p>" : "<p>모든 플레이어가 투표를 마쳐 더 이상 수정할 수 없습니다.</p>"}
+        </div>
+      ` : ""}
+      ${canEdit ? `
+        ${renderPlayerOptions({ selected: selected ? [selected] : [], max: 1, actionName: "select-vote", candidates })}
+        <div class="spacer"></div>
+        <button class="btn danger full" data-action="cast-vote" ${selected ? "" : "disabled"}>${voted ? "투표 수정" : "투표 확정"}</button>
+      ` : ""}
+      <p class="center muted" style="margin-top:14px">${allVotesDone ? "방장이 결과를 확인할 때까지 기다려 주세요." : "모든 플레이어의 투표를 기다리고 있습니다."}</p>
+    </section>
+  `);
+}
+
+function renderTeamResults(result) {
+  return `
+    <div class="team-result">
+      <div class="team-chip ${result.villageWin ? "win" : "lose"}">🏠 마을 팀 ${result.villageWin ? "승리" : "패배"}</div>
+      <div class="team-chip ${result.wolfWin ? "win" : "lose"}">🐺 늑대 팀 ${result.wolfWin ? "승리" : "패배"}</div>
+      <div class="team-chip ${result.tannerWin ? "win" : "lose"}">🧵 무두장이 ${result.tannerWin ? "단독 승리" : "패배"}</div>
+    </div>
+    ${result.outcomeReason ? `<div class="action-box center"><strong>${escapeHtml(result.outcomeReason)}</strong></div>` : ""}
+  `;
+}
+
+function renderResults() {
+  if (!publicResult) {
+    return pageFrame('<section class="card center"><p>투표 결과를 불러오는 중입니다.</p></section>');
+  }
+  const eliminated = publicResult.eliminatedUids ?? [];
+  return pageFrame(`
+    <section class="card">
+      <div class="status-banner">
+        <strong>📊 최종 투표 결과</strong>
+        <span>${eliminated.length ? "최다 득표자가 처형되었습니다. 승리팀은 카드 공개가 모두 끝난 뒤 발표됩니다." : "처형 대상이 없습니다. 승리팀은 카드 공개가 모두 끝난 뒤 발표됩니다."}</span>
+      </div>
+      ${renderMayorBanner()}
+      ${renderRevealerAnnouncement()}
+      ${publicResult.wasRevote ? `<div class="action-box center"><strong>🔁 ${Number(publicResult.voteRound ?? 2)}차 투표 끝에 결과가 확정되었습니다.</strong></div>` : ""}
+      <div class="vote-table">
+        ${sortedPlayers().map((player) => `
+          <div class="vote-row ${eliminated.includes(player.uid) ? "eliminated" : ""}">
+            <span>${escapeHtml(player.nickname)} ${eliminated.includes(player.uid) ? "💀" : ""}</span>
+            <span class="vote-count">${publicResult.voteCounts?.[player.uid] ?? 0}표</span>
+          </div>
+        `).join("")}
+      </div>
+      <div class="action-box">
+        <h3>누가 누구에게 투표했나요?</h3>
+        ${(publicResult.votes ?? []).map((vote) => `<p>${escapeHtml(playerName(vote.voterUid))} → <strong>${escapeHtml(playerName(vote.targetUid))}</strong></p>`).join("")}
+      </div>
+      ${isHost() ? `
+        <div class="host-panel">
+          <button class="btn full" data-action="reveal-roles">카드 공개 시작</button>
+        </div>
+      ` : '<p class="center muted" style="margin-top:14px">방장이 카드 공개를 시작할 때까지 기다려 주세요.</p>'}
+    </section>
+  `);
+}
+
+function renderReveal() {
+  if (!publicResult || !revealedResult) {
+    return pageFrame('<section class="card center"><p>직업 정보를 불러오는 중입니다.</p></section>');
+  }
+  const eliminated = publicResult.eliminatedUids ?? [];
+  const winners = revealedResult.winnerUids ?? [];
+  const revealOrder = revealedResult.revealOrder ?? sortedPlayers().map((player) => player.uid);
+  const legacyIndex = Math.min(Number(revealedResult.revealIndex ?? 0), revealOrder.length);
+  const legacyRevealed = revealOrder.slice(0, legacyIndex);
+  const revealedUids = Array.isArray(revealedResult.revealedUids) ? revealedResult.revealedUids : legacyRevealed;
+  const revealedSet = new Set(revealedUids);
+  const revealedCount = revealOrder.filter((uid) => revealedSet.has(uid)).length;
+  const allRevealed = revealedCount >= revealOrder.length;
+  return pageFrame(`
+    <section class="card">
+      <div class="status-banner">
+        <strong>🎴 카드 공개</strong>
+        <span>${allRevealed ? "모든 카드가 공개되었습니다. 이제 승리팀을 확인하세요." : `방장이 공개하고 싶은 카드를 눌러 공개합니다. ${revealedCount}명 / ${revealOrder.length}명 공개`}</span>
+      </div>
+      ${renderMayorBanner()}
+      ${renderRevealerAnnouncement()}
+      <div class="reveal-grid">
+        ${revealOrder.map((uid) => getPlayer(uid)).filter(Boolean).map((player) => {
+          const isRevealed = revealedSet.has(player.uid);
+          const canRevealCard = isHost() && !isRevealed;
+          const initial = roleInfo(revealedResult.initialRoles?.[player.uid]);
+          const final = roleInfo(revealedResult.finalRoles?.[player.uid]);
+          const changed = revealedResult.initialRoles?.[player.uid] !== revealedResult.finalRoles?.[player.uid];
+          return `
+            <div class="reveal-card ${isRevealed ? "is-revealed" : ""} ${canRevealCard ? "reveal-clickable" : ""}" ${canRevealCard ? `data-action="reveal-card" data-uid="${player.uid}" role="button" title="${escapeHtml(player.nickname)} 카드 공개"` : ""}>
+              <div class="reveal-card-inner">
+                <div class="reveal-face reveal-back">
+                  <div class="card-symbol">🌙</div>
+                  <strong>${escapeHtml(player.nickname)}${eliminated.includes(player.uid) ? " 💀" : ""}</strong>
+                  <span>카드 뒷면</span>
+                </div>
+                <div class="reveal-face reveal-front ${eliminated.includes(player.uid) ? "eliminated" : ""}">
+                  <div class="reveal-head">
+                    <strong>${escapeHtml(player.nickname)} ${eliminated.includes(player.uid) ? "💀" : ""}</strong>
+                    ${allRevealed && winners.includes(player.uid) ? '<span class="winner-mark">승리</span>' : ""}
+                  </div>
+                  <div class="big-role">${final.icon} ${final.name}</div>
+                  <div class="role-change">
+                    처음: <strong>${initial.icon} ${initial.name}</strong>
+                    ${changed ? ` → 최종: <strong>${final.icon} ${final.name}</strong>` : ""}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+      ${!allRevealed ? `
+        <p class="reveal-lock-note">아직 승리팀은 공개되지 않았습니다.</p>
+        ${isHost()
+          ? '<p class="center muted" style="margin-top:14px">공개하고 싶은 플레이어의 카드 뒷면을 직접 눌러 주세요.</p>'
+          : '<p class="center muted" style="margin-top:14px">방장이 카드를 선택해 공개할 때까지 기다려 주세요.</p>'}
+      ` : `
+        <div class="divider"></div>
+        <h3>중앙 카드</h3>
+        <div class="center-cards">
+          ${(revealedResult.centerRoles ?? []).map((role, index) => {
+            const info = roleInfo(role);
+            return `<div class="center-card"><div class="mini-icon">${info.icon}</div><div class="mini-name">${index + 1}. ${info.name}</div></div>`;
+          }).join("")}
+        </div>
+        <div class="divider"></div>
+        ${renderTeamResults(publicResult)}
+        ${isHost() ? `
+          <div class="host-panel">
+            <button class="btn success full" data-action="reset-lobby">같은 방에서 새 게임</button>
+          </div>
+        ` : '<p class="center muted" style="margin-top:14px">방장이 새 게임을 준비할 때까지 기다려 주세요.</p>'}
+      `}
+    </section>
+  `);
+}
+
+function render() {
+  if (!currentUser) return;
+  if (!roomCode || !roomData) {
+    appEl.innerHTML = renderLanding();
+    return;
+  }
+
+  const renderers = {
+    lobby: renderLobby,
+    night: renderNight,
+    discussion: renderDiscussion,
+    voting: renderVoting,
+    revote: renderVoting,
+    results: renderResults,
+    reveal: renderReveal,
+  };
+  const renderer = renderers[roomData.status] ?? renderLobby;
+  const newestChatId = chatMessages.at(-1)?.id ?? null;
+  const shouldScrollChat = newestChatId !== lastRenderedChatId;
+  appEl.innerHTML = renderer();
+  if (shouldScrollChat) {
+    lastRenderedChatId = newestChatId;
+    requestAnimationFrame(() => {
+      const chatBox = document.querySelector("#chat-messages");
+      if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    });
+  }
+}
+
+function toggleSelection(list, value, max) {
+  if (list.includes(value)) return list.filter((item) => item !== value);
+  if (max === 1) return [value];
+  if (list.length >= max) return [...list.slice(1), value];
+  return [...list, value];
+}
+
+async function safeRun(task) {
+  try {
+    await task();
+  } catch (error) {
+    showToast(formatError(error));
+  }
+}
+
+appEl.addEventListener("submit", (event) => {
+  if (event.target.id === "chat-form") {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const message = String(formData.get("message") ?? uiState.chatDraft);
+    safeRun(() => sendChatMessage(message));
+    return;
+  }
+
+  if (event.target.id !== "entry-form") return;
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const mode = event.submitter?.value;
+  const nickname = String(formData.get("nickname") ?? "");
+  const code = String(formData.get("roomCode") ?? "");
+  safeRun(async () => {
+    event.submitter.disabled = true;
+    if (mode === "create") await createRoom(nickname);
+    if (mode === "join") await joinRoom(code, nickname);
+  });
+});
+
+appEl.addEventListener("input", (event) => {
+  if (event.target.id === "chat-input") {
+    uiState.chatDraft = event.target.value.slice(0, 120);
+  }
+});
+
+appEl.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-action]");
+  if (!target) return;
+  const action = target.dataset.action;
+
+  if (action === "copy-code") {
+    safeRun(async () => {
+      await navigator.clipboard.writeText(roomCode);
+      showToast(`방 코드 ${roomCode}를 복사했습니다.`);
+    });
+    return;
+  }
+
+  if (action === "wolf-hunt") {
+    queueWolfHuntClick();
+    return;
+  }
+
+  if (action === "change-role-count") {
+    const role = target.dataset.role;
+    const delta = Number(target.dataset.delta ?? 0);
+    safeRun(() => changeRoleCount(role, delta));
+    return;
+  }
+
+  if (action === "kick-player") {
+    safeRun(() => kickPlayer(target.dataset.uid));
+    return;
+  }
+
+  if (action === "show-role") {
+    roleVisible = true;
+    render();
+    return;
+  }
+  if (action === "hide-role") {
+    roleVisible = false;
+    render();
+    return;
+  }
+
+  if (action === "select-player") {
+    const uid = target.dataset.uid;
+    const max = Number(target.dataset.max ?? 1);
+    uiState.selectedPlayers = toggleSelection(uiState.selectedPlayers, uid, max);
+    render();
+    return;
+  }
+
+  if (action === "select-center") {
+    const index = Number(target.dataset.index);
+    const max = Number(target.dataset.max ?? 1);
+    uiState.selectedCenters = toggleSelection(uiState.selectedCenters, index, max);
+    render();
+    return;
+  }
+
+  if (action === "seer-mode") {
+    uiState.seerMode = target.dataset.mode;
+    uiState.selectedPlayers = [];
+    uiState.selectedCenters = [];
+    render();
+    return;
+  }
+
+  if (action === "select-vote") {
+    uiState.voteTarget = target.dataset.uid;
+    render();
+    return;
+  }
+
+  const asyncActions = {
+    "leave-room": leaveRoom,
+    "delete-room": deleteRoomCompletely,
+    "start-game": startGame,
+    "finish-role": () => submitAction("finish-role", {}),
+    "start-voting": startVoting,
+    "publish-result": publishVoteResult,
+    "reveal-roles": revealRoles,
+    "reveal-card": () => revealCard(target.dataset.uid),
+    "reset-lobby": resetToLobby,
+    "cast-vote": () => castVote(uiState.voteTarget),
+    "submit-wolf": () => submitAction("wolf-center", { centerIndex: uiState.selectedCenters[0] }),
+    "submit-seer": () => submitAction("seer-view", uiState.seerMode === "center"
+      ? { mode: "center", centerIndices: uiState.selectedCenters }
+      : { mode: "player", targetUid: uiState.selectedPlayers[0] }),
+    "submit-robber": () => submitAction("robber-swap", { targetUid: uiState.selectedPlayers[0] }),
+    "submit-witch-view": () => submitAction("witch-view", { centerIndex: uiState.selectedCenters[0] }),
+    "submit-witch-swap": () => submitAction("witch-decide", { centerIndex: Number(target.dataset.index), swap: true }),
+    "submit-witch-keep": () => submitAction("witch-decide", { centerIndex: Number(target.dataset.index), swap: false }),
+    "submit-troublemaker": () => submitAction("troublemaker-swap", { targetUids: uiState.selectedPlayers }),
+    "submit-drunk": () => submitAction("drunk-swap", { centerIndex: uiState.selectedCenters[0] }),
+    "submit-doppel-copy": () => submitAction("doppel-copy", { targetUid: uiState.selectedPlayers[0] }),
+    "submit-doppel-seer": () => submitAction("doppel-seer", uiState.seerMode === "center"
+      ? { mode: "center", centerIndices: uiState.selectedCenters }
+      : { mode: "player", targetUid: uiState.selectedPlayers[0] }),
+    "submit-doppel-robber": () => submitAction("doppel-robber", { targetUid: uiState.selectedPlayers[0] }),
+    "submit-doppel-troublemaker": () => submitAction("doppel-troublemaker", { targetUids: uiState.selectedPlayers }),
+    "submit-doppel-minion": () => submitAction("doppel-minion", {}),
+    "submit-doppel-drunk": () => submitAction("doppel-drunk", { centerIndex: uiState.selectedCenters[0] }),
+    "submit-doppel-witch-swap": () => submitAction("doppel-witch", { centerIndex: uiState.selectedCenters[0], swap: true }),
+    "submit-doppel-witch-keep": () => submitAction("doppel-witch", { centerIndex: uiState.selectedCenters[0], swap: false }),
+    "submit-doppel-revealer": () => submitAction("doppel-revealer", { targetUid: uiState.selectedPlayers[0] }),
+    "submit-revealer": () => submitAction("revealer-check", { targetUid: uiState.selectedPlayers[0] }),
+  };
+
+  if (asyncActions[action]) safeRun(asyncActions[action]);
+});
+
+  </script>
+</body>
+</html>
